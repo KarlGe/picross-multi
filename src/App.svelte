@@ -20,6 +20,7 @@
 </script>
 
 <div class="App">
+  <Connection />
   <div class="App-main">
     {#each boardData as squareRow}
       <div>
