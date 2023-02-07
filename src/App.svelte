@@ -1,7 +1,7 @@
-<script>
-  import Square from "./components/Square.svelte";
+<script lang="ts">
+  import Square from "./components/Square/Square.svelte";
   import { onMount } from "svelte";
-  import Connection from "./components/Connection.svelte";
+  // import Connection from "./components/Connection.svelte";
   let boardData = [];
   const rows = 5;
   const cols = 5;
@@ -19,26 +19,27 @@
   });
 </script>
 
-<div class="App">
-  <Connection />
-  <div class="App-main">
-    {#each boardData as squareRow}
-      <div>
-        {#each squareRow as square}
-          <Square bind:squareData={square} />
-        {/each}
-      </div>
-    {/each}
+<main>
+  <div class="App">
+    <!-- <Connection /> -->
+    <div class="App-main">
+      {#each boardData as squareRow}
+        <div>
+          {#each squareRow as square}
+            <Square bind:squareData={square} />
+          {/each}
+        </div>
+      {/each}
+    </div>
   </div>
-</div>
+</main>
 
 <style lang="scss">
   @import "./styles/index.scss";
   .App-main {
-    background-color: #f9f6f6;
     min-height: 100vh;
     display: flex;
-    color: $test;
+    color: var(test);
     flex-direction: column;
     align-items: center;
     justify-content: center;
