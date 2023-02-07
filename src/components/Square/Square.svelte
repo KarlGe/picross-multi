@@ -1,8 +1,9 @@
-<script>
-  export let squareData;
-  export let setState;
-  export let test;
-  console.log(squareData);
+<script lang="ts">
+  import type { SquareData } from "../../types/squareData";
+
+
+  export let squareData: SquareData;
+  export let setState = undefined;
 
   const onClick = (type) => {
     if (type == "right") {
@@ -27,4 +28,5 @@
   on:contextmenu|preventDefault={() => onClick("right")}
   on:mouseenter={() => console.log("enter")}
 />
+
 <style src="./square.scss"></style>

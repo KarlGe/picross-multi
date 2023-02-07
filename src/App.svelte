@@ -1,8 +1,9 @@
 <script lang="ts">
   import Square from "./components/Square/Square.svelte";
   import { onMount } from "svelte";
+  import type { SquareData } from "./types/squareData";
   // import Connection from "./components/Connection.svelte";
-  let boardData = [];
+  let boardData: SquareData[][] = [];
   const rows = 5;
   const cols = 5;
   let test = 1;
@@ -17,6 +18,15 @@
     }
     boardData = initialData;
   });
+
+  const clearBoard = () => {
+    const newData = boardData.map((row) => {
+      return row.map((cell) => {
+        return { ...cell, state: "" } as SquareData;
+      });
+    });
+    boardData = newData;
+  };
 </script>
 
 <main>
@@ -30,6 +40,7 @@
           {/each}
         </div>
       {/each}
+      <button on:click={clearBoard}>Clear</button>
     </div>
   </div>
 </main>
