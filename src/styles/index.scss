@@ -1,11 +1,24 @@
 * {
-  --test: blue;
+  --background: #151d26;
+  --background-light: #3f5772;
+  --color-cancel: #723f3f;
 }
 
-html, body {
-    background-color: #333;
+html,
+body {
+  background-color: var(--background);
 }
 
 li {
   list-style-type: none;
+}
+
+.App-main {
+  min-height: 100vh;
+  display: flex;
+  color: var(test);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
 }

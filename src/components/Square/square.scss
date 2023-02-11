@@ -2,17 +2,17 @@ button {
   display: inline-block;
   width: 40px;
   height: 40px;
-  border: 1px solid black;
+  border: 1px solid var(--background-light);
   position: relative;
   &:hover,
   &:focus {
-    border: 1px solid red;
+    border: 1px solid var(--color-cancel);
   }
   &.clicked {
     &:after {
       display: inline-block;
       content: "";
-      background-color: black;
+      background-color: var(--background-light);
       position: absolute;
       width: 36px;
       height: 36px;
@@ -26,7 +26,7 @@ button {
       content: "\00d7";
       font-size: 2rem;
       line-height: 2rem;
-      color: red;
+      color: var(--color-cancel);
       position: absolute;
       left: 0;
       right: 0;
