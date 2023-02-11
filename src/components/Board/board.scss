@@ -1,0 +1,36 @@
+#board-wrapper {
+  color: white;
+  display: grid;
+  grid-template-areas:
+    "blank columnheader"
+    "rowheader board"
+    "boardfooter boardfooter";
+  #board {
+    grid-area: board;
+  }
+  #board-footer {
+    grid-area: boardfooter;
+  }
+  .column-data {
+    display: flex;
+    grid-area: columnheader;
+    > div {
+      width: var(--square-size);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+    }
+  }
+  .row-data {
+    display: flex;
+    flex-direction: column;
+    grid-area: rowheader;
+    > div {
+      height: var(--square-size);
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+  }
+}

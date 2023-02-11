@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import Square from "../Square/Square.svelte";
-  import type { SquareData } from "../../types/squareData";
+  import type { SquareData } from "@customTypes/squareData";
+  import Square from "@components/Square/Square.svelte";
+  import data from "@data/1.json";
   let boardData: SquareData[][] = [];
-  const rows = 5;
-  const cols = 5;
-  let test = 1;
+  const rows = data.height;
+  const cols = data.width;
 
   onMount(() => {
     const initialData = [];
@@ -26,15 +26,41 @@
     });
     boardData = newData;
   };
+  
 </script>
-
-<div>
-  {#each boardData as squareRow}
-    <div>
-      {#each squareRow as square}
-        <Square bind:squareData={square} />
-      {/each}
-    </div>
-  {/each}
-  <button on:click={clearBoard}>Clear</button>
+<div id="board-wrapper">
+  <div class="row-data">
+    {#each data.rows as rowData}
+      <div>
+        {#each rowData as rowNumber}
+          <div>{rowNumber}</div>
+        {/each}
+      </div>
+    {/each}
+  </div>
+  <div class="column-data">
+    {#each data.columns as columnData}
+      <div>
+        {#each columnData as columnNumber}
+          <div>{columnNumber}</div>
+        {/each}
+      </div>
+    {/each}
+  </div>
+  <div id="board">
+    {#each boardData as squareRow}
+      <div>
+        {#each squareRow as square}
+          <Square bind:squareData={square} />
+        {/each}
+      </div>
+    {/each}
+  </div>
+  <div id="board-footer">
+    <button on:click={clearBoard}>Clear</button>
+  </div>
 </div>
+
+<style lang="scss">
+  @import "./board.scss";
+</style>

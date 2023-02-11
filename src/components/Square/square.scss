@@ -1,7 +1,7 @@
 button {
   display: inline-block;
-  width: 40px;
-  height: 40px;
+  width: var(--square-size);
+  height: var(--square-size);
   border: 1px solid var(--background-light);
   position: relative;
   margin-top: 0;
