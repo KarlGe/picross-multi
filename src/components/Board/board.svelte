@@ -1,20 +1,31 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { SquareData } from "@customTypes/squareData";
+  import type { MarginData, SquareData } from "@customTypes/gameTypes";
   import Square from "@components/Square/Square.svelte";
   import data from "@data/1.json";
+  import { createMargins, generatePuzzle } from "../../services/generator";
   let boardData: SquareData[][] = [];
-  const rows = data.height;
-  const cols = data.width;
-
+  let margins: MarginData = { rows: [], columns: [] };
+  // const rows = data.height;
+  // const cols = data.width;
+  const rows = 5;
+  const cols = 5;
   onMount(() => {
+    const puzzle = generatePuzzle(rows, cols);
     const initialData = [];
     for (let row = 0; row < rows; row++) {
       initialData.push([]);
       for (let column = 0; column < cols; column++) {
-        initialData[row].push({ rowNum: row, columnNum: column, state: "" });
+        const filled = puzzle[row][column];
+        initialData[row].push({
+          rowNum: row,
+          columnNum: column,
+          // state: filled ? "clicked" : "",
+          state: '',
+        } as SquareData);
       }
     }
+    margins = createMargins(puzzle);
     boardData = initialData;
   });
 
@@ -26,11 +37,11 @@
     });
     boardData = newData;
   };
-  
 </script>
+
 <div id="board-wrapper">
   <div class="row-data">
-    {#each data.rows as rowData}
+    {#each margins.rows as rowData}
       <div>
         {#each rowData as rowNumber}
           <div>{rowNumber}</div>
@@ -39,7 +50,7 @@
     {/each}
   </div>
   <div class="column-data">
-    {#each data.columns as columnData}
+    {#each margins.columns as columnData}
       <div>
         {#each columnData as columnNumber}
           <div>{columnNumber}</div>

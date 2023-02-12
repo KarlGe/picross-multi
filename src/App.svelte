@@ -2,7 +2,6 @@
   import Board from "./components/Board/board.svelte";
 
   // import Connection from "./components/Connection.svelte";
-
 </script>
 
 <main>

@@ -1,6 +1,5 @@
 <script lang="ts">
-  import type { SquareData } from "../../types/squareData";
-
+  import type { SquareData } from "../../types/gameTypes";
 
   export let squareData: SquareData;
   export let setState = undefined;
