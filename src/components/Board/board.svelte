@@ -1,17 +1,23 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { MarginData, SquareData } from "@customTypes/gameTypes";
+  import type { MarginData, Puzzle, SquareData } from "@customTypes/gameTypes";
   import Square from "@components/Square/Square.svelte";
   import data from "@data/1.json";
-  import { createMargins, generatePuzzle } from "../../services/generator";
+  import {
+    checkSolution,
+    createMargins,
+    generatePuzzle,
+  } from "../../services/generator";
   let boardData: SquareData[][] = [];
   let margins: MarginData = { rows: [], columns: [] };
+  let puzzle: Puzzle = undefined;
+  let finished = false;
   // const rows = data.height;
   // const cols = data.width;
   const rows = 5;
   const cols = 5;
   onMount(() => {
-    const puzzle = generatePuzzle(rows, cols);
+    puzzle = generatePuzzle(rows, cols);
     const initialData = [];
     for (let row = 0; row < rows; row++) {
       initialData.push([]);
@@ -21,13 +27,17 @@
           rowNum: row,
           columnNum: column,
           // state: filled ? "clicked" : "",
-          state: '',
+          state: "",
         } as SquareData);
       }
     }
     margins = createMargins(puzzle);
     boardData = initialData;
   });
+
+  const checkBoard = () => {
+    finished = checkSolution(puzzle, boardData);
+  };
 
   const clearBoard = () => {
     const newData = boardData.map((row) => {
@@ -37,6 +47,7 @@
     });
     boardData = newData;
   };
+  $: puzzle, console.log(puzzle);
 </script>
 
 <div id="board-wrapper">
@@ -69,6 +80,8 @@
   </div>
   <div id="board-footer">
     <button on:click={clearBoard}>Clear</button>
+    <button on:click={checkBoard}>Check</button>
+    <span>Completed: {finished}</span>
   </div>
 </div>
 
