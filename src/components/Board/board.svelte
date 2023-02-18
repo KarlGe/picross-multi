@@ -55,7 +55,7 @@
     </div>
     <div id="board">
       {#each boardData as squareRow}
-        <div>
+        <div class="row">
           {#each squareRow as square}
             <Square bind:squareData={square} />
           {/each}

@@ -7,6 +7,14 @@
     "boardfooter boardfooter";
   #board {
     grid-area: board;
+    :global {
+      .row:nth-child(6n) button {
+        border-top-width: 3px;
+      }
+      button:nth-child(6n) {
+        border-left-width: 3px;
+      }
+    }
   }
   #board-footer {
     grid-area: boardfooter;
