@@ -4,6 +4,8 @@ export type MarginData = {
   columns: number[][];
 };
 
+export type BoardData = SquareData[][];
+
 export type SquareData = {
   rowNum: number;
   columnNum: number;
