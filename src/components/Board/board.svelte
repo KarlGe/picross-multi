@@ -15,6 +15,8 @@
     boardData = initialData;
   });
 
+  $: initialData, (boardData = initialData);
+
   const dispatch = createEventDispatcher();
 
   const checkBoard = () => {
