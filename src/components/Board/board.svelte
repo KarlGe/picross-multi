@@ -39,7 +39,7 @@
       {#each margins.rows as rowData}
         <div>
           {#each rowData as rowNumber}
-            <div>{rowNumber}</div>
+            <div class="row-number">{rowNumber}</div>
           {/each}
         </div>
       {/each}

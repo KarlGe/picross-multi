@@ -43,5 +43,11 @@
       justify-content: flex-end;
       align-items: center;
     }
+    .row-number::after {
+      content: "-";
+    }
+    .row-number:last-child::after {
+      content: none;
+    }
   }
 }
