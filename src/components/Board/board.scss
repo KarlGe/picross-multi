@@ -22,32 +22,4 @@
   #board-footer {
     grid-area: boardfooter;
   }
-  .column-data {
-    display: flex;
-    grid-area: columnheader;
-    > div {
-      width: var(--square-size);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-    }
-  }
-  .row-data {
-    display: flex;
-    flex-direction: column;
-    grid-area: rowheader;
-    > div {
-      height: var(--square-size);
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-    }
-    .row-number::after {
-      content: "-";
-    }
-    .row-number:last-child::after {
-      content: none;
-    }
-  }
 }

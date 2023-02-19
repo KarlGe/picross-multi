@@ -1,8 +1,10 @@
 export type Puzzle = number[][];
 export type MarginData = {
-  rows: number[][];
-  columns: number[][];
+  rows: MarginNumbers;
+  columns: MarginNumbers;
 };
+
+export type MarginNumbers = number[][];
 
 export type BoardData = SquareData[][];
 

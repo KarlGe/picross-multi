@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Margins from "@components/Margins/Margins.svelte";
   import Square from "@components/Square/Square.svelte";
   import type {
     BoardData,
@@ -35,24 +36,7 @@
 
 <div id="board-wrapper">
   {#if margins.rows && margins.columns && boardData}
-    <div class="row-data">
-      {#each margins.rows as rowData}
-        <div>
-          {#each rowData as rowNumber}
-            <div class="row-number">{rowNumber}</div>
-          {/each}
-        </div>
-      {/each}
-    </div>
-    <div class="column-data">
-      {#each margins.columns as columnData}
-        <div>
-          {#each columnData as columnNumber}
-            <div>{columnNumber}</div>
-          {/each}
-        </div>
-      {/each}
-    </div>
+    <Margins bind:marginData={margins} />
     <div id="board">
       {#each boardData as squareRow}
         <div class="row">
