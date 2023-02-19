@@ -24,6 +24,7 @@
 <button
   class={squareData.state}
   on:click={() => onClick("left")}
+  on:dblclick={() => onClick("right")}
   on:contextmenu|preventDefault={() => onClick("right")}
   on:mouseenter={() => console.log("enter")}
 />
