@@ -8,6 +8,9 @@
   #board {
     grid-area: board;
     :global {
+      .row {
+        display: flex;
+      }
       .row:nth-child(6n) button {
         border-top-width: 3px;
       }
