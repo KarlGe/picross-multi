@@ -16,10 +16,10 @@ button {
       content: "";
       background-color: var(--background-light);
       position: absolute;
-      width: 36px;
-      height: 36px;
-      left: 1px;
-      top: 1px;
+      width: 92%;
+      height: 92%;
+      left: 4%;
+      top: 4%;
     }
   }
   &.excluded {
@@ -33,6 +33,11 @@ button {
       left: 0;
       right: 0;
       top: 0;
+      bottom: 0;
+      text-align: center;
+      vertical-align: center;
+      line-height: 100%;
+      margin: auto;
     }
   }
 }

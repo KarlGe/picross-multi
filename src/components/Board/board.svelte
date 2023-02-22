@@ -8,10 +8,14 @@
   } from "@customTypes/gameTypes";
   import { onMount } from "svelte";
   import BoardFooter from "./BoardFooter/BoardFooter.svelte";
+  export let marginRowWidth: number;
+  export let rows: number;
+  export let cols: number;
   export let margins: MarginData;
   export let finished: boolean;
   export let initialData: BoardData;
   export let boardData: BoardData;
+  export let screenWidth;
 
   onMount(() => {
     boardData = initialData;
@@ -27,11 +31,22 @@
     });
     boardData = newData;
   };
+  let styleVars;
+  $: gameWidth = screenWidth - marginRowWidth;
+
+  const getSquareSize = (totalWidth: number, numberOfSquares: number) => {
+    return Math.min((totalWidth - 50) / numberOfSquares, 50);
+  };
+
+  $: styleVars = `
+  --board-size: ${gameWidth}px; 
+  --col-number: ${cols}; 
+  --square-size: ${getSquareSize(gameWidth, cols)}px`;
 </script>
 
-<div id="board-wrapper">
+<div id="board-wrapper" style={styleVars}>
   {#if margins.rows && margins.columns && boardData}
-    <Margins bind:marginData={margins} />
+    <Margins bind:marginData={margins} bind:rowWidth={marginRowWidth} />
     <div id="board">
       {#each boardData as squareRow}
         <div class="row">

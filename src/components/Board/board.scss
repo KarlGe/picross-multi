@@ -5,6 +5,7 @@
     "blank columnheader"
     "rowheader board"
     "boardfooter boardfooter";
+  grid-template-columns: auto 1fr;
   #board {
     grid-area: board;
     :global {
