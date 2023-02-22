@@ -6,23 +6,18 @@
     MarginData,
     SquareData,
   } from "@customTypes/gameTypes";
-  import { createEventDispatcher, onMount } from "svelte";
+  import { onMount } from "svelte";
+  import BoardFooter from "./BoardFooter/BoardFooter.svelte";
   export let margins: MarginData;
   export let finished: boolean;
   export let initialData: BoardData;
-  let boardData: BoardData;
+  export let boardData: BoardData;
 
   onMount(() => {
     boardData = initialData;
   });
 
   $: initialData, (boardData = initialData);
-
-  const dispatch = createEventDispatcher();
-
-  const checkBoard = () => {
-    dispatch("checkBoard", { boardData });
-  };
 
   const clearBoard = () => {
     const newData = boardData.map((row) => {
@@ -47,11 +42,7 @@
       {/each}
     </div>
   {/if}
-  <div id="board-footer">
-    <button on:click={clearBoard}>Clear</button>
-    <button on:click={checkBoard}>Check</button>
-    <span>Completed: {finished}</span>
-  </div>
+  <BoardFooter on:clearBoard={clearBoard} bind:finished />
 </div>
 
 <style lang="scss">

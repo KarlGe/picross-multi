@@ -12,10 +12,12 @@
     createMargins,
     generatePuzzle,
   } from "@services/generator";
+  import Settings from "@components/Settings/Settings.svelte";
   let margins: MarginData = { rows: [], columns: [] };
   let puzzle: Puzzle = undefined;
   let finished = false;
   let initialData: BoardData = [];
+  let boardData: BoardData;
   // const rows = data.height;
   // const cols = data.width;
   let rows = 5;
@@ -57,16 +59,13 @@
     <!-- <Connection /> -->
     <div class="App-main">
       <Board
+        bind:boardData
         bind:margins
         bind:finished
         bind:initialData
         on:checkBoard={checkBoard}
       />
-      <div>
-        <input type="number" bind:value={rows} />
-        <input type="number" bind:value={cols} />
-        <button on:click={createPuzzle}>Generate</button>
-      </div>
+      <Settings on:create-puzzle={createPuzzle} bind:rows bind:cols />
     </div>
   </div>
 </main>

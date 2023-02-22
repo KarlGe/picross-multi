@@ -19,7 +19,9 @@
       }
     }
   }
-  #board-footer {
-    grid-area: boardfooter;
+  :global {
+    #board-footer {
+      grid-area: boardfooter;
+    }
   }
 }
