@@ -6,6 +6,7 @@
     "rowheader board"
     "boardfooter boardfooter";
   grid-template-columns: auto 1fr;
+  touch-action: none;
   #board {
     grid-area: board;
     :global {

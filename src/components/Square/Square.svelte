@@ -26,12 +26,11 @@
       setState("clicked");
     }
   };
-
-  const onStartDrag = () => {
+  const onDragStart = () => {
     onClick("left");
     squaresDragged = [squareData];
   };
-  const onDragEnter = () => {
+  const onDragEnter = (e) => {
     if (isInLine(squareData, squaresDragged)) {
       squaresDragged.push(squareData);
       squareData.state = squaresDragged[0].state;
@@ -41,10 +40,13 @@
 
 <button
   class={squareData.state}
-  on:pointerdown={onStartDrag}
+  on:pointerdown={onDragStart}
   on:dblclick={() => onClick("right")}
   on:contextmenu|preventDefault={() => onClick("right")}
   on:pointerenter={onDragEnter}
+  on:gotpointercapture={(e) => {
+    e.currentTarget.releasePointerCapture(e.pointerId);
+  }}
 />
 
 <style src="./square.scss"></style>

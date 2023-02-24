@@ -49,10 +49,7 @@
 
 <svelte:body on:pointerup={endDrag} />
 
-<div
-  id="board-wrapper"
-  style={styleVars}
->
+<div id="board-wrapper" style={styleVars}>
   {#if margins.rows && margins.columns && boardData}
     <Margins bind:marginData={margins} bind:rowWidth={marginRowWidth} />
     <div id="board">
