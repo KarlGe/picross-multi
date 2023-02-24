@@ -6,6 +6,7 @@
     MarginData,
     SquareData,
   } from "@customTypes/gameTypes";
+  import { createInitialData } from "@services/generator";
   import { onMount } from "svelte";
   import BoardFooter from "./BoardFooter/BoardFooter.svelte";
   export let marginRowWidth: number;
@@ -24,12 +25,8 @@
   $: initialData, (boardData = initialData);
 
   const clearBoard = () => {
-    const newData = boardData.map((row) => {
-      return row.map((cell) => {
-        return { ...cell, state: "" } as SquareData;
-      });
-    });
-    boardData = newData;
+    boardData = createInitialData(rows, cols);
+    initialData = boardData;
   };
   let styleVars;
   $: gameWidth = screenWidth - marginRowWidth;

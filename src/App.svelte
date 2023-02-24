@@ -9,6 +9,7 @@
   } from "@customTypes/gameTypes";
   import {
     checkSolution,
+    createInitialData,
     createMargins,
     generatePuzzle,
   } from "@services/generator";
@@ -25,22 +26,6 @@
   let rows = 5;
   let cols = 5;
 
-  const createInitialData = (rowNum: number, colNum: number) => {
-    const data: BoardData = [];
-    for (let row = 0; row < rowNum; row++) {
-      data.push([]);
-      for (let column = 0; column < colNum; column++) {
-        // const filled = puzzle[row][column];
-        data[row].push({
-          rowNum: row,
-          columnNum: column,
-          // state: filled ? "clicked" : "",
-          state: "",
-        } as SquareData);
-      }
-    }
-    return data;
-  };
   const createPuzzle = () => {
     puzzle = generatePuzzle(rows, cols);
     margins = createMargins(puzzle);

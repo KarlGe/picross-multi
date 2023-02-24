@@ -1,4 +1,9 @@
-import type { Puzzle, MarginData, SquareData } from "@customTypes/gameTypes";
+import type {
+  Puzzle,
+  MarginData,
+  SquareData,
+  BoardData,
+} from "@customTypes/gameTypes";
 const randomRange = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
@@ -16,6 +21,23 @@ function boardIterator(
     onRow && onRow(rowIndex);
   }
 }
+
+export const createInitialData = (rowNum: number, colNum: number) => {
+  const data: BoardData = [];
+  for (let row = 0; row < rowNum; row++) {
+    data.push([]);
+    for (let column = 0; column < colNum; column++) {
+      // const filled = puzzle[row][column];
+      data[row].push({
+        rowNum: row,
+        columnNum: column,
+        // state: filled ? "clicked" : "",
+        state: "",
+      } as SquareData);
+    }
+  }
+  return data;
+};
 
 export const generatePuzzle = (width: number, height: number): Puzzle => {
   const puzzle: Puzzle = [];
