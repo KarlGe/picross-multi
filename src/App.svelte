@@ -26,13 +26,15 @@
   let rows = 5;
   let cols = 5;
 
-  const createPuzzle = () => {
-    puzzle = generatePuzzle(rows, cols);
+  const createPuzzle = (numRows: number, numCols: number) => {
+    rows = numRows;
+    cols = numCols;
+    puzzle = generatePuzzle(numRows, numCols);
     margins = createMargins(puzzle);
     initialData = createInitialData(rows, cols);
   };
   onMount(() => {
-    createPuzzle();
+    createPuzzle(rows, cols);
   });
 
   const checkBoard = () => {
@@ -56,7 +58,12 @@
         bind:screenWidth={windowWidth}
         on:checkBoard={checkBoard}
       />
-      <Settings on:create-puzzle={createPuzzle} bind:rows bind:cols />
+      <Settings
+        on:create-puzzle={(e) =>
+          createPuzzle(e.detail.numRows, e.detail.numCols)}
+        bind:rows
+        bind:cols
+      />
     </div>
   </div>
 </main>
