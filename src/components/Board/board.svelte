@@ -42,13 +42,12 @@
 
   let squaresDragged: SquareData[] = [];
 
-  const startDrag = () => {};
   const endDrag = () => {
     squaresDragged = [];
   };
 </script>
 
-<svelte:body on:mouseup={endDrag} on:touchend={endDrag} />
+<svelte:body on:pointerup={endDrag} />
 
 <div
   id="board-wrapper"

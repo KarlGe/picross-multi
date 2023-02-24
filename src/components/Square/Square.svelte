@@ -41,8 +41,7 @@
 
 <button
   class={squareData.state}
-  on:mousedown={onStartDrag}
-  on:touchstart={onStartDrag}
+  on:pointerdown={onStartDrag}
   on:dblclick={() => onClick("right")}
   on:contextmenu|preventDefault={() => onClick("right")}
   on:pointerenter={onDragEnter}
