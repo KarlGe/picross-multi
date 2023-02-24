@@ -50,8 +50,8 @@
     createPuzzle();
   });
 
-  const checkBoard = (event) => {
-    finished = checkSolution(puzzle, event.detail.boardData);
+  const checkBoard = () => {
+    finished = checkSolution(puzzle, boardData);
   };
 </script>
 

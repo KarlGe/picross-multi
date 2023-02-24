@@ -57,7 +57,7 @@
       {/each}
     </div>
   {/if}
-  <BoardFooter on:clearBoard={clearBoard} bind:finished />
+  <BoardFooter on:clearBoard={clearBoard} on:checkBoard bind:finished />
 </div>
 
 <style lang="scss">
