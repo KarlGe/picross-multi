@@ -1,32 +1,51 @@
 <script lang="ts">
-  import type { SquareData } from "../../types/gameTypes";
+  import { isInLine } from "@utils/boardUtils";
+  import type { SquareData, SquareState } from "../../types/gameTypes";
+
+  type ClickType = "left" | "right";
 
   export let squareData: SquareData;
-  export let setState = undefined;
+  export let squaresDragged: SquareData[];
 
-  const onClick = (type) => {
+  const setState = (state: SquareState) => {
+    squareData.state = state;
+  };
+
+  const onClick = (type: ClickType) => {
     if (type == "right") {
       if (squareData.state == "excluded") {
-        squareData.state = "";
+        setState("");
       } else {
-        squareData.state = "excluded";
+        setState("excluded");
       }
       return;
     }
     if (squareData.state == "clicked") {
-      squareData.state = "";
+      setState("");
     } else {
-      squareData.state = "clicked";
+      setState("clicked");
+    }
+  };
+
+  const onStartDrag = () => {
+    onClick("left");
+    squaresDragged = [squareData];
+  };
+  const onDragEnter = () => {
+    if (isInLine(squareData, squaresDragged)) {
+      squaresDragged.push(squareData);
+      squareData.state = squaresDragged[0].state;
     }
   };
 </script>
 
 <button
   class={squareData.state}
-  on:click={() => onClick("left")}
+  on:mousedown={onStartDrag}
+  on:touchstart={onStartDrag}
   on:dblclick={() => onClick("right")}
   on:contextmenu|preventDefault={() => onClick("right")}
-  on:mouseenter={() => console.log("enter")}
+  on:pointerenter={onDragEnter}
 />
 
 <style src="./square.scss"></style>

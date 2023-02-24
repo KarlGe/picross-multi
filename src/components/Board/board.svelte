@@ -39,16 +39,28 @@
   --board-size: ${gameWidth}px; 
   --col-number: ${cols}; 
   --square-size: ${getSquareSize(gameWidth, cols)}px`;
+
+  let squaresDragged: SquareData[] = [];
+
+  const startDrag = () => {};
+  const endDrag = () => {
+    squaresDragged = [];
+  };
 </script>
 
-<div id="board-wrapper" style={styleVars}>
+<svelte:body on:mouseup={endDrag} on:touchend={endDrag} />
+
+<div
+  id="board-wrapper"
+  style={styleVars}
+>
   {#if margins.rows && margins.columns && boardData}
     <Margins bind:marginData={margins} bind:rowWidth={marginRowWidth} />
     <div id="board">
       {#each boardData as squareRow}
         <div class="row">
           {#each squareRow as square}
-            <Square bind:squareData={square} />
+            <Square bind:squareData={square} bind:squaresDragged />
           {/each}
         </div>
       {/each}

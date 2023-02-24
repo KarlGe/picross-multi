@@ -8,8 +8,10 @@ export type MarginNumbers = number[][];
 
 export type BoardData = SquareData[][];
 
+export type SquareState = "clicked" | "excluded" | "";
+
 export type SquareData = {
   rowNum: number;
   columnNum: number;
-  state: "clicked" | "excluded" | "";
+  state: SquareState;
 };
