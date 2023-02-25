@@ -42,9 +42,10 @@
   };
 </script>
 
+<svelte:window bind:innerHeight={windowHeight} bind:innerWidth={windowWidth} />
+
 <main>
   <div class="App">
-    <WindowSize bind:windowWidth bind:windowHeight />
     <!-- <Connection /> -->
     <div class="App-main">
       <Board
