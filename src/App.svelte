@@ -1,12 +1,7 @@
 <script lang="ts">
   import Board from "./components/Board/board.svelte";
   import { onMount } from "svelte";
-  import type {
-    BoardData,
-    MarginData,
-    Puzzle,
-    SquareData,
-  } from "@customTypes/gameTypes";
+  import type { BoardData, MarginData, Puzzle } from "@customTypes/gameTypes";
   import {
     checkSolution,
     createInitialData,
@@ -14,7 +9,6 @@
     generatePuzzle,
   } from "@services/generator";
   import Settings from "@components/Settings/Settings.svelte";
-  import WindowSize from "@components/Utils/WindowSize.svelte";
   let margins: MarginData = { rows: [], columns: [] };
   let puzzle: Puzzle = undefined;
   let finished = false;
