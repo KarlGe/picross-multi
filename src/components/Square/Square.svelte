@@ -1,5 +1,6 @@
 <script lang="ts">
   import { isInLine } from "@utils/boardUtils";
+  import { clickHandler } from "../../actions/clickHandler";
   import type { SquareData, SquareState } from "../../types/gameTypes";
 
   type ClickType = "left" | "right";
@@ -20,7 +21,7 @@
       }
       return;
     }
-    if (squareData.state == "clicked") {
+    if (squareData.state != "") {
       setState("");
     } else {
       setState("clicked");
@@ -40,13 +41,11 @@
 
 <button
   class={squareData.state}
-  on:pointerdown={onDragStart}
-  on:dblclick={() => onClick("right")}
-  on:contextmenu|preventDefault={() => onClick("right")}
+  use:clickHandler
+  on:leftclick={onDragStart}
+  on:doubleclick={() => onClick("right")}
+  on:rightclick={() => onClick("right")}
   on:pointerenter={onDragEnter}
-  on:gotpointercapture={(e) => {
-    e.currentTarget.releasePointerCapture(e.pointerId);
-  }}
 />
 
 <style src="./square.scss"></style>
