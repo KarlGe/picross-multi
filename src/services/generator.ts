@@ -4,8 +4,26 @@ import type {
   SquareData,
   BoardData,
 } from "@customTypes/gameTypes";
+import { getQuerySeed, setQuerySeed } from "@utils/utils";
+import { getRandGenerator, makeSeed } from "./rand";
+
+let randomGenerator: () => number;
+
+const setupRandomGenerator = () => {
+  if (typeof randomGenerator === "undefined") {
+    randomGenerator = getRandGenerator(getQuerySeed());
+  } else {
+    const newSeed = makeSeed();
+    randomGenerator = getRandGenerator(newSeed);
+    setQuerySeed(newSeed);
+  }
+};
+
 const randomRange = (min: number, max: number) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  if (typeof randomGenerator === "undefined") {
+    setupRandomGenerator();
+  }
+  return Math.floor(randomGenerator() * (max - min + 1)) + min;
 };
 
 function boardIterator(
@@ -41,6 +59,7 @@ export const createInitialData = (rowNum: number, colNum: number) => {
 
 export const generatePuzzle = (width: number, height: number): Puzzle => {
   const puzzle: Puzzle = [];
+  setupRandomGenerator();
   const addCell = (row) => {
     if (!puzzle[row]) {
       puzzle.push([]);
