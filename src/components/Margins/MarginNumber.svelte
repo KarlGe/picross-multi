@@ -1,11 +1,26 @@
 <script lang="ts">
   import Cross from "@components/Icons/Cross.svelte";
+  import type { CellPosition } from "@customTypes/gameTypes";
   import { eventTypes } from "@utils/events";
+  import { clickHandler } from "../../actions/clickHandler";
 
   export let type: "row" | "column";
   export let marginNumber: number;
+  export let marginCol: number = undefined;
+  export let marginRow: number = undefined;
+
   let crossedOut = false;
   window.addEventListener(eventTypes.clear, () => (crossedOut = false));
+  window.addEventListener(
+    eventTypes.crossall,
+    (e: CustomEvent<CellPosition>) => {
+      const { col, row } = e.detail;
+      console.log(e.detail);
+      if (marginCol === col && marginRow === row) {
+        crossedOut = true;
+      }
+    }
+  );
 </script>
 
 <button

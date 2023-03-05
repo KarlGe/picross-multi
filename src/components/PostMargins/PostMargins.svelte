@@ -1,11 +1,12 @@
 <script lang="ts">
   import Cross from "@components/Icons/Cross.svelte";
+  import type { CellPosition } from "@customTypes/gameTypes";
   import { eventTypes } from "@utils/events";
 
   export let rows;
   export let cols;
 
-  const onClick = (eventDetail: { row?: number; col?: number }) => {
+  const onClick = (eventDetail: CellPosition) => {
     window.dispatchEvent(
       new CustomEvent(eventTypes.crossall, { detail: eventDetail })
     );

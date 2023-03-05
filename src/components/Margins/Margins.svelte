@@ -15,20 +15,20 @@
 </script>
 
 <div class="row-data" style="display:block" bind:this={rowElement}>
-  {#each marginData.rows as rowData}
+  {#each marginData.rows as rowData, i}
     <div>
       {#each rowData as rowNumber}
-        <MarginNumber type="row" bind:marginNumber={rowNumber} />
+        <MarginNumber type="row" marginRow={i} bind:marginNumber={rowNumber} />
         <span class="delimiter">-</span>
       {/each}
     </div>
   {/each}
 </div>
 <div class="column-data">
-  {#each marginData.columns as columnData}
+  {#each marginData.columns as columnData, i}
     <div>
       {#each columnData as columnNumber}
-        <MarginNumber type="column" bind:marginNumber={columnNumber} />
+        <MarginNumber type="column" marginCol={i} bind:marginNumber={columnNumber} />
       {/each}
     </div>
   {/each}
