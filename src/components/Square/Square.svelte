@@ -44,17 +44,23 @@
       squareData.state = squaresDragged[0].state;
     }
   };
-  onMount(() => {
-    window.addEventListener(
-      eventTypes.crossall,
-      (e: CustomEvent<CellPosition>) => {
-        const { col, row } = e.detail;
-        if (col === squareData.columnNum || row === squareData.rowNum) {
-          if (squareData.state !== "clicked") {
-            setState("excluded");
-          }
-        }
+  const onCrossAll = (event: CustomEvent<CellPosition>, inverted = false) => {
+    const { col, row } = event.detail;
+    if (col === squareData.columnNum || row === squareData.rowNum) {
+      if (inverted && squareData.state === "excluded") {
+        setState("");
+        return;
       }
+      if (squareData.state !== "clicked") {
+        setState("excluded");
+      }
+    }
+  };
+  onMount(() => {
+    window.addEventListener(eventTypes.crossall, onCrossAll);
+    window.addEventListener(
+      eventTypes.crossallinvert,
+      (e: CustomEvent<CellPosition>) => onCrossAll(e, true)
     );
   });
 </script>

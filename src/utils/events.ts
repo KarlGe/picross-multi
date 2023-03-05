@@ -1,5 +1,6 @@
 export const eventTypes = {
-    newGame: 'new-game',
-    clear: 'clear',
-    crossall: 'cross-all'
-}
+  newGame: "new-game",
+  clear: "clear",
+  crossall: "cross-all",
+  crossallinvert: "cross-all-invert",
+};

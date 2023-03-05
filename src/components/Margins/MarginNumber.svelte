@@ -11,14 +11,15 @@
 
   let crossedOut = false;
   window.addEventListener(eventTypes.clear, () => (crossedOut = false));
-  window.addEventListener(
-    eventTypes.crossall,
-    (e: CustomEvent<CellPosition>) => {
-      const { col, row } = e.detail;
-      if (marginCol === col && marginRow === row) {
-        crossedOut = true;
-      }
+  const onCrossAll = (event: CustomEvent<CellPosition>, inverted = false) => {
+    const { col, row } = event.detail;
+    if (marginCol === col && marginRow === row) {
+      crossedOut = !inverted;
     }
+  };
+  window.addEventListener(eventTypes.crossall, onCrossAll);
+  window.addEventListener(eventTypes.crossallinvert, (e) =>
+    onCrossAll(e, true)
   );
 </script>
 
