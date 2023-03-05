@@ -1,8 +1,39 @@
+import type { PuzzleSize } from "@customTypes/gameTypes";
 import { makeSeed } from "@services/rand";
 
 const queryKeys = {
   seed: "s",
+  levelSize: "ls",
 };
+const sizeDelimiter = "x";
+const defaultSize: PuzzleSize = { rowSize: 5, columnSize: 5 };
+
+export function setLevelSize(rowSize, columnSize) {
+  const searchParams = new URLSearchParams(window.location.search);
+  searchParams.set(
+    queryKeys.levelSize,
+    `${rowSize}${sizeDelimiter}${columnSize}`
+  );
+  window.history.pushState({}, "", `/?${searchParams}`);
+}
+
+export function getLevelSize() {
+  const searchParams = new URLSearchParams(window.location.search);
+  const querySize = searchParams.get(queryKeys.levelSize);
+  const size = querySize?.split(sizeDelimiter);
+  if (!size || size.length !== 2) {
+    return defaultSize;
+  }
+  const [queryRows, queryColumns] = size;
+  const sizeDef: PuzzleSize = {
+    rowSize: parseInt(queryRows),
+    columnSize: parseInt(queryColumns),
+  };
+  if (isNaN(sizeDef.rowSize) || isNaN(sizeDef.columnSize)) {
+    return defaultSize;
+  }
+  return sizeDef;
+}
 
 export function setQuerySeed(newSeed: number) {
   const searchParams = new URLSearchParams(window.location.search);

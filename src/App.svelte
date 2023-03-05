@@ -10,6 +10,7 @@
   } from "@services/generator";
   import Settings from "@components/Settings/Settings.svelte";
   import { eventTypes } from "@utils/events";
+  import { getLevelSize, setLevelSize } from "@utils/utils";
   let margins: MarginData = { rows: [], columns: [] };
   let puzzle: Puzzle = undefined;
   let finished = false;
@@ -24,6 +25,7 @@
   const createPuzzle = (numRows: number, numCols: number) => {
     rows = numRows;
     cols = numCols;
+    setLevelSize(rows, cols);
     puzzle = generatePuzzle(numRows, numCols);
     margins = createMargins(puzzle);
     initialData = createInitialData(rows, cols);
@@ -32,7 +34,8 @@
     window.dispatchEvent(new Event(eventTypes.clear));
   };
   onMount(() => {
-    createPuzzle(rows, cols);
+    const startSize = getLevelSize();
+    createPuzzle(startSize.rowSize, startSize.columnSize);
   });
 
   const checkBoard = () => {

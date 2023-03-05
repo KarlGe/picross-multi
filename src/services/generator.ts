@@ -4,7 +4,7 @@ import type {
   SquareData,
   BoardData,
 } from "@customTypes/gameTypes";
-import { getQuerySeed, setQuerySeed } from "@utils/utils";
+import { getLevelSize, getQuerySeed, setQuerySeed } from "@utils/utils";
 import { getRandGenerator, makeSeed } from "./rand";
 
 let randomGenerator: () => number;
@@ -27,13 +27,13 @@ const randomRange = (min: number, max: number) => {
 };
 
 function boardIterator(
-  width: number,
-  height: number,
+  rows: number,
+  cols: number,
   onRow?: (row: number) => void,
   onColumn?: (row: number, column: number) => void
 ) {
-  for (var rowIndex = 0; rowIndex < height; rowIndex += 1) {
-    for (var columnIndex = 0; columnIndex < width; columnIndex += 1) {
+  for (var rowIndex = 0; rowIndex < rows; rowIndex += 1) {
+    for (var columnIndex = 0; columnIndex < cols; columnIndex += 1) {
       onColumn && onColumn(rowIndex, columnIndex);
     }
     onRow && onRow(rowIndex);
@@ -57,8 +57,9 @@ export const createInitialData = (rowNum: number, colNum: number) => {
   return data;
 };
 
-export const generatePuzzle = (width: number, height: number): Puzzle => {
+export const generatePuzzle = (rows: number, cols: number): Puzzle => {
   const puzzle: Puzzle = [];
+  getLevelSize();
   setupRandomGenerator();
   const addCell = (row) => {
     if (!puzzle[row]) {
@@ -66,7 +67,7 @@ export const generatePuzzle = (width: number, height: number): Puzzle => {
     }
     puzzle[row].push(randomRange(0, 1));
   };
-  boardIterator(width, height, undefined, addCell);
+  boardIterator(rows, cols, undefined, addCell);
   return puzzle;
 };
 
