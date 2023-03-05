@@ -15,7 +15,6 @@
     eventTypes.crossall,
     (e: CustomEvent<CellPosition>) => {
       const { col, row } = e.detail;
-      console.log(e.detail);
       if (marginCol === col && marginRow === row) {
         crossedOut = true;
       }
