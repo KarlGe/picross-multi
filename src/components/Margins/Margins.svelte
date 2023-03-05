@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { MarginData } from "@customTypes/gameTypes";
   import { afterUpdate, tick } from "svelte";
+  import MarginNumber from "./MarginNumber.svelte";
 
   let rowElement;
   export let rowWidth: number;
@@ -17,7 +18,8 @@
   {#each marginData.rows as rowData}
     <div>
       {#each rowData as rowNumber}
-        <div class="row-number">{rowNumber}</div>
+        <MarginNumber type="row" bind:marginNumber={rowNumber} />
+        <span class="delimiter">-</span>
       {/each}
     </div>
   {/each}
@@ -26,7 +28,7 @@
   {#each marginData.columns as columnData}
     <div>
       {#each columnData as columnNumber}
-        <div>{columnNumber}</div>
+        <MarginNumber type="column" bind:marginNumber={columnNumber} />
       {/each}
     </div>
   {/each}

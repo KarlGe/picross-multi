@@ -19,10 +19,10 @@
     justify-content: flex-end;
     align-items: center;
   }
-  .row-number::after {
-    content: "-";
-  }
-  .row-number:last-child::after {
-    content: none;
+  .delimiter {
+    font-size: 10px;
+    &:last-child {
+      display: none;
+    }
   }
 }

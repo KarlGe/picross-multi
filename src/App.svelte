@@ -9,6 +9,7 @@
     generatePuzzle,
   } from "@services/generator";
   import Settings from "@components/Settings/Settings.svelte";
+  import { eventTypes } from "@utils/events";
   let margins: MarginData = { rows: [], columns: [] };
   let puzzle: Puzzle = undefined;
   let finished = false;
@@ -26,6 +27,8 @@
     puzzle = generatePuzzle(numRows, numCols);
     margins = createMargins(puzzle);
     initialData = createInitialData(rows, cols);
+    window.dispatchEvent(new Event(eventTypes.newGame));
+    window.dispatchEvent(new Event(eventTypes.clear));
   };
   onMount(() => {
     createPuzzle(rows, cols);
