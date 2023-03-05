@@ -1,0 +1,28 @@
+#row-footer {
+  flex-direction: column;
+  :global {
+    svg {
+      height: .75rem;
+    }
+  }
+}
+#column-footer {
+  :global {
+    svg {
+      width: .75rem;
+    }
+  }
+}
+#row-footer,
+#column-footer {
+  display: flex;
+  button {
+    width: 1rem;
+    position: relative;
+    flex: 1;
+    border: none;
+    background: none;
+    color: var(--color-cancel);
+    padding: 0;
+  }
+}

@@ -2,10 +2,11 @@
   color: white;
   display: grid;
   grid-template-areas:
-    "blank columnheader"
-    "rowheader board"
-    "boardfooter boardfooter";
-  grid-template-columns: auto 1fr;
+    ". columnheader ."
+    "rowheader board rowfooter"
+    ". columnfooter ."
+    "boardfooter boardfooter boardfooter";
+  grid-template-columns: auto 1fr auto;
   touch-action: none;
   #board {
     grid-area: board;
@@ -14,14 +15,20 @@
         display: flex;
       }
       .row:nth-child(6n) button {
-        border-top-width: 3px;
+        border-top-width: 2px;
       }
       button:nth-child(6n) {
-        border-left-width: 3px;
+        border-left-width: 2px;
       }
     }
   }
   :global {
+    #row-footer {
+      grid-area: rowfooter;
+    }
+    #column-footer {
+      grid-area: columnfooter;
+    }
     #board-footer {
       grid-area: boardfooter;
     }

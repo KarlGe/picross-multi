@@ -15,3 +15,8 @@ export type SquareData = {
   columnNum: number;
   state: SquareState;
 };
+
+export type CellPosition = {
+  row?: number;
+  col?: number;
+};

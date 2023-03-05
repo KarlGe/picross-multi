@@ -1,5 +1,6 @@
 <script lang="ts">
   import Margins from "@components/Margins/Margins.svelte";
+  import PostMargins from "@components/PostMargins/PostMargins.svelte";
   import Square from "@components/Square/Square.svelte";
   import type {
     BoardData,
@@ -34,7 +35,8 @@
   $: gameWidth = screenWidth - marginRowWidth;
 
   const getSquareSize = (totalWidth: number, numberOfSquares: number) => {
-    return Math.min((totalWidth - 50) / numberOfSquares, 50);
+    const squareSize = Math.floor(Math.min((totalWidth - 50) / numberOfSquares, 50)); 
+    return squareSize - squareSize % 2;
   };
 
   $: styleVars = `
@@ -63,6 +65,7 @@
         </div>
       {/each}
     </div>
+    <PostMargins bind:rows bind:cols />
   {/if}
   <BoardFooter on:clearBoard={clearBoard} on:checkBoard bind:finished />
 </div>

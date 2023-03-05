@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Cross from "@components/Icons/Cross.svelte";
   import { eventTypes } from "@utils/events";
 
   export let type: "row" | "column";
@@ -12,6 +13,7 @@
   class="margin-number {type} {crossedOut ? 'crossed-out' : ''}"
 >
   {marginNumber}
+  <Cross show={crossedOut} />
 </button>
 
 <style lang="scss" src="./marginNumber.scss"></style>
