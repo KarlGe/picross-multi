@@ -16,12 +16,13 @@
     height: 100%;
   }
   &.crossed-out {
-    color: var(--color-disabled);
+    // color: var(--color-cancel);
   }
   :global {
     svg {
       stroke-width: 1rem;
-      color: var(--color-disabled);
+      opacity: 80%;
+      color: var(--color-cancel);
       position: absolute;
       width: 10px;
       height: 10px;
