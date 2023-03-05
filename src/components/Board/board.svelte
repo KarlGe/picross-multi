@@ -29,6 +29,7 @@
   const clearBoard = () => {
     boardData = createInitialData(rows, cols);
     initialData = boardData;
+    finished = false;
     window.dispatchEvent(new Event(eventTypes.clear));
   };
   let styleVars;

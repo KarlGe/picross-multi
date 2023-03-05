@@ -27,6 +27,7 @@
     puzzle = generatePuzzle(numRows, numCols);
     margins = createMargins(puzzle);
     initialData = createInitialData(rows, cols);
+    finished = false;
     window.dispatchEvent(new Event(eventTypes.newGame));
     window.dispatchEvent(new Event(eventTypes.clear));
   };
