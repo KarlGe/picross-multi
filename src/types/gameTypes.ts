@@ -1,5 +1,10 @@
 export type PuzzleSize = { rowSize: number; columnSize: number };
-export type Puzzle = number[][];
+
+export type Puzzle = {
+  solution: number[][];
+  size: PuzzleSize;
+};
+
 export type MarginData = {
   rows: MarginNumbers;
   columns: MarginNumbers;

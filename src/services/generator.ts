@@ -4,6 +4,7 @@ import type {
   SquareData,
   BoardData,
 } from "@customTypes/gameTypes";
+import { makeEmptyPuzzle } from "@utils/puzzleUtils";
 import { getLevelSize, getQuerySeed, setQuerySeed } from "@utils/utils";
 import { getRandGenerator, makeSeed } from "./rand";
 
@@ -45,7 +46,7 @@ export const createInitialData = (rowNum: number, colNum: number) => {
   for (let row = 0; row < rowNum; row++) {
     data.push([]);
     for (let column = 0; column < colNum; column++) {
-      // const filled = puzzle[row][column];
+      // const filled = puzzle.solution[row][column];
       data[row].push({
         rowNum: row,
         columnNum: column,
@@ -58,44 +59,40 @@ export const createInitialData = (rowNum: number, colNum: number) => {
 };
 
 export const generatePuzzle = (rows: number, cols: number): Puzzle => {
-  const puzzle: Puzzle = [];
+  const puzzle = makeEmptyPuzzle(rows, cols);
   getLevelSize();
   setupRandomGenerator();
   const addCell = (row) => {
-    if (!puzzle[row]) {
-      puzzle.push([]);
+    if (!puzzle.solution[row]) {
+      puzzle.solution.push([]);
     }
-    puzzle[row].push(randomRange(0, 1));
+    puzzle.solution[row].push(randomRange(0, 1));
   };
   boardIterator(rows, cols, undefined, addCell);
   return puzzle;
 };
 
-const getPuzzleDimensions = (puzzle: Puzzle) => {
-  return { rows: puzzle.length, columns: puzzle[0].length };
-};
-
 export const checkSolution = (puzzle: Puzzle, board: SquareData[][]) => {
-  const dimensions = getPuzzleDimensions(puzzle);
+  const dimensions = puzzle.size;
   let matches = true;
   const onCell = (rowIndex, colIndex) => {
-    const puzzleValue = puzzle[rowIndex][colIndex];
+    const puzzleValue = puzzle.solution[rowIndex][colIndex];
     const boardValue = board[rowIndex][colIndex].state === "clicked" ? 1 : 0;
     if (puzzleValue !== boardValue) {
       matches = false;
     }
   };
-  boardIterator(dimensions.rows, dimensions.columns, undefined, onCell);
+  boardIterator(dimensions.rowSize, dimensions.columnSize, undefined, onCell);
   return matches;
 };
 
 export const createMargins = (puzzle: Puzzle) => {
-  const dimensions = getPuzzleDimensions(puzzle);
+  const dimensions = puzzle.size;
 
   const marginData: MarginData = { rows: [], columns: [] };
 
   const onCell = (rowIndex, columnIndex, currentSequence, sequenceArray) => {
-    const cell = puzzle[rowIndex][columnIndex];
+    const cell = puzzle.solution[rowIndex][columnIndex];
     if (cell === 1) {
       currentSequence += 1;
     } else if (cell === 0 && currentSequence > 0) {
@@ -105,12 +102,12 @@ export const createMargins = (puzzle: Puzzle) => {
     return currentSequence;
   };
 
-  for (var rowIndex = 0; rowIndex < dimensions.rows; rowIndex += 1) {
+  for (var rowIndex = 0; rowIndex < dimensions.rowSize; rowIndex += 1) {
     const dataRow = [];
     let currentSequence = 0;
     for (
       var columnIndex = 0;
-      columnIndex < dimensions.columns;
+      columnIndex < dimensions.columnSize;
       columnIndex += 1
     ) {
       currentSequence = onCell(rowIndex, columnIndex, currentSequence, dataRow);
@@ -122,12 +119,12 @@ export const createMargins = (puzzle: Puzzle) => {
   }
   for (
     var columnIndex = 0;
-    columnIndex < dimensions.columns;
+    columnIndex < dimensions.columnSize;
     columnIndex += 1
   ) {
     const dataCol = [];
     let currentSequence = 0;
-    for (var rowIndex = 0; rowIndex < dimensions.rows; rowIndex += 1) {
+    for (var rowIndex = 0; rowIndex < dimensions.rowSize; rowIndex += 1) {
       currentSequence = onCell(rowIndex, columnIndex, currentSequence, dataCol);
     }
     if (currentSequence > 0) {
