@@ -27,8 +27,9 @@
     cols = numCols;
     setLevelSize(rows, cols);
     puzzle = generatePuzzle(numRows, numCols);
-    margins = createMargins(puzzle);
-    initialData = createInitialData(rows, cols);
+    const [generatedMargins, solution] = createMargins(puzzle);
+    margins = generatedMargins;
+    initialData = createInitialData(rows, cols, solution);
     finished = false;
     window.dispatchEvent(new Event(eventTypes.newGame));
     window.dispatchEvent(new Event(eventTypes.clear));

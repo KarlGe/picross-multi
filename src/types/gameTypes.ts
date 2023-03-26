@@ -1,7 +1,9 @@
 export type PuzzleSize = { rowSize: number; columnSize: number };
 
+export type Solution = number[][]; 
+
 export type Puzzle = {
-  solution: number[][];
+  solution: Solution;
   size: PuzzleSize;
 };
 

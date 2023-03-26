@@ -41,6 +41,20 @@ export function setQuerySeed(newSeed: number) {
   window.history.pushState({}, "", `/?${searchParams}`);
 }
 
+export function boardIterator(
+  rows: number,
+  cols: number,
+  onRow?: (row: number) => void,
+  onColumn?: (row: number, column: number) => void
+) {
+  for (var rowIndex = 0; rowIndex < rows; rowIndex += 1) {
+    onRow && onRow(rowIndex);
+    for (var columnIndex = 0; columnIndex < cols; columnIndex += 1) {
+      onColumn && onColumn(rowIndex, columnIndex);
+    }
+  }
+}
+
 export function getQuerySeed() {
   const searchParams = new URLSearchParams(window.location.search);
   const querySeed = parseInt(searchParams.get(queryKeys.seed));

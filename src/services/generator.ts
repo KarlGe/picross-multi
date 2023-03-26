@@ -1,12 +1,15 @@
 import type {
   Puzzle,
+  SquareState,
   MarginData,
   SquareData,
   BoardData,
+  Solution,
 } from "@customTypes/gameTypes";
 import { makeEmptyPuzzle } from "@utils/puzzleUtils";
-import { getLevelSize, getQuerySeed, setQuerySeed } from "@utils/utils";
+import { boardIterator, getLevelSize, getQuerySeed, setQuerySeed } from "@utils/utils";
 import { getRandGenerator, makeSeed } from "./rand";
+import { Solver } from "./solver/solver";
 
 let randomGenerator: () => number;
 
@@ -27,31 +30,25 @@ const randomRange = (min: number, max: number) => {
   return Math.floor(randomGenerator() * (max - min + 1)) + min;
 };
 
-function boardIterator(
-  rows: number,
-  cols: number,
-  onRow?: (row: number) => void,
-  onColumn?: (row: number, column: number) => void
-) {
-  for (var rowIndex = 0; rowIndex < rows; rowIndex += 1) {
-    for (var columnIndex = 0; columnIndex < cols; columnIndex += 1) {
-      onColumn && onColumn(rowIndex, columnIndex);
-    }
-    onRow && onRow(rowIndex);
-  }
-}
-
-export const createInitialData = (rowNum: number, colNum: number) => {
+export const createInitialData = (rowNum: number, colNum: number, solution: Solution) => {
   const data: BoardData = [];
   for (let row = 0; row < rowNum; row++) {
     data.push([]);
     for (let column = 0; column < colNum; column++) {
       // const filled = puzzle.solution[row][column];
+      const solutionValue = solution[row][column]; 
+      let state = '' as SquareState;
+      if (solutionValue === 1) {
+        state = 'clicked';
+      }
+      if (solutionValue === 0) {
+        state = 'excluded';
+      }
       data[row].push({
         rowNum: row,
         columnNum: column,
         // state: filled ? "clicked" : "",
-        state: "",
+        state,
       } as SquareData);
     }
   }
@@ -86,7 +83,7 @@ export const checkSolution = (puzzle: Puzzle, board: SquareData[][]) => {
   return matches;
 };
 
-export const createMargins = (puzzle: Puzzle) => {
+export const createMargins = (puzzle: Puzzle): [MarginData, Solution] => {
   const dimensions = puzzle.size;
 
   const marginData: MarginData = { rows: [], columns: [] };
@@ -132,5 +129,7 @@ export const createMargins = (puzzle: Puzzle) => {
     }
     marginData.columns.push(dataCol);
   }
-  return marginData;
+  const solver = new Solver(marginData, puzzle);
+  const solution = solver.solve();
+  return [marginData, solution];
 };
