@@ -88,20 +88,6 @@ export class Solver {
     this.solution[rowIndex][columnIndex] = cellValue;
   }
 
-  fillRow(requirements: number[], rowIndex: number) {
-    const filled = this.generateFilled(requirements, this.rowSize);
-    filled.forEach((cellValue, columnIndex) => {
-      this.setCell(rowIndex, columnIndex, cellValue);
-    });
-  }
-
-  fillColumn(requirements: number[], columnIndex: number) {
-    const filled = this.generateFilled(requirements, this.colSize);
-    filled.forEach((cellValue, rowIndex) => {
-      this.setCell(rowIndex, columnIndex, cellValue);
-    });
-  }
-
   public solve() {
     console.log(this.puzzle);
     this.solveRecursion();
@@ -116,9 +102,9 @@ export class Solver {
     return this.solution;
   }
 
-  trySolveRow(rowIndex, row, rowRequirement) {
+  tryRowComplete(rowIndex, rowRequirement) {
     var localRequirement = [...rowRequirement];
-    var localRow = [...row];
+    var localRow = [...this.solution[rowIndex]];
     for (let colIndex = 0; colIndex < this.colSize; colIndex++) {
       const cell = localRow[colIndex];
       let requirement = localRequirement[0];
@@ -148,7 +134,7 @@ export class Solver {
   solveRow(rowRequirement: number[], rowIndex) {
     var localRow = this.solution[rowIndex];
     var localRequirement = [...rowRequirement];
-    if (this.trySolveRow(rowIndex, localRow, localRequirement)) {
+    if (this.tryRowComplete(rowIndex, localRequirement)) {
       return;
     }
     this.currentRun = 0;
@@ -163,7 +149,7 @@ export class Solver {
     }
     return column;
   }
-  trySolveColumn(colIndex, colData, colRequirement) {
+  tryColumnComplete(colIndex, colData, colRequirement) {
     var localRequirement = [...colRequirement];
     var localRow = [...colData];
     for (let rowIndex = 0; rowIndex < this.rowSize; rowIndex++) {
@@ -185,7 +171,7 @@ export class Solver {
   solveColumn(colRequirement: number[], colIndex: number) {
     var localRequirement = [...colRequirement];
     const localCol = this.getColumn(colIndex);
-    if (this.trySolveColumn(colIndex, localCol, colRequirement)) {
+    if (this.tryColumnComplete(colIndex, localCol, colRequirement)) {
       return;
     }
     this.currentRun = 0;
@@ -216,25 +202,14 @@ export class Solver {
         if (this.isRowComplete(rowIndex)) {
           return;
         }
-        const minimumTotal = this.getRequirementTotal(rowRequirement, true);
-        if (minimumTotal === rowSize || minimumTotal === 0) {
-          this.fillRow(rowRequirement, rowIndex);
-          this.marginData.rows[rowIndex] = [];
-        } else {
-          this.solveRow(rowRequirement, rowIndex);
-        }
+        this.solveRow(rowRequirement, rowIndex);
       }
     );
     this.axisIterator(marginData.columns, (columnRequirement, columnIndex) => {
       if (this.isColComplete(columnIndex)) {
         return;
       }
-      const minimumTotal = this.getRequirementTotal(columnRequirement, true);
-      if (minimumTotal === columnSize || minimumTotal === 0) {
-        this.fillColumn(columnRequirement, columnIndex);
-      } else {
-        this.solveColumn(columnRequirement, columnIndex);
-      }
+      this.solveColumn(columnRequirement, columnIndex);
     });
   }
 
