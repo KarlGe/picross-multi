@@ -6,8 +6,13 @@ import type {
   BoardData,
   Solution,
 } from "@customTypes/gameTypes";
+import type MarginNumber from "@components/Margins/MarginNumber.svelte";
 
 type AxisTotal = { [n: number]: number };
+
+const copyMarginData = (data: MarginData) => {
+  return JSON.parse(JSON.stringify(data)) as MarginData;
+};
 
 export class Solver {
   marginData: MarginData;
@@ -21,7 +26,7 @@ export class Solver {
   colSize: number;
 
   constructor(marginData: MarginData, puzzle: Puzzle) {
-    this.marginData = marginData;
+    this.marginData = copyMarginData(marginData);
     this.puzzle = puzzle;
     this.rowSize = puzzle.size.rowSize;
     this.colSize = puzzle.size.columnSize;
@@ -42,18 +47,22 @@ export class Solver {
     );
   }
 
-  excludeRemainingRow(rowIndex: number) {
+  setRowComplete(rowIndex: number) {
     const row = this.solution[rowIndex];
     row.forEach((cell, index) => {
       this.setCell(rowIndex, index, cell === -1 ? 0 : cell);
     });
+    this.marginData.rows[rowIndex] = [];
+    this.completedRows.push(rowIndex);
   }
 
-  excludeRemainingColumn(colIndex: number) {
+  setColComplete(colIndex: number) {
     this.solution.forEach((row, rowIndex) => {
       const cell = row[colIndex];
       this.setCell(rowIndex, colIndex, cell === -1 ? 0 : cell);
     });
+    this.marginData.columns[colIndex] = [];
+    this.completedCols.push(colIndex);
   }
 
   generateFilled(requirement, maxLength) {
@@ -91,38 +100,41 @@ export class Solver {
   }
 
   public solve() {
-    const { rowSize, columnSize } = this.puzzle.size;
     console.log(this.puzzle);
-
-    this.axisIterator(this.marginData.rows, (rowRequirement, rowIndex) => {
-      const minimumTotal = this.getRequirementTotal(rowRequirement, true);
-      if (minimumTotal === rowSize || minimumTotal === 0) {
-        this.fillRow(rowRequirement, rowIndex);
-      }
-    });
-    this.axisIterator(
-      this.marginData.columns,
-      (columnRequirement, columnIndex) => {
-        const minimumTotal = this.getRequirementTotal(columnRequirement, true);
-        if (minimumTotal === columnSize || minimumTotal === 0) {
-          this.fillColumn(columnRequirement, columnIndex);
-        }
-      }
-    );
-    for (let rowIndex = 0; rowIndex < this.rowSize; rowIndex++) {
-      if (this.isRowComplete(rowIndex)) {
-        continue;
-      }
-    }
-    for (let colIndex = 0; colIndex < this.rowSize; colIndex++) {
-      if (this.isColComplete(colIndex)) {
-        continue;
-      }
-    }
+    this.solveRecursion();
+    console.log("Margin Data: ", this.marginData);
+    this.solveRecursion();
     console.log("Solution: ", this.solution);
     console.log("Completed: ", this.completedRows, this.completedCols);
 
     return this.solution;
+  }
+
+  solveRecursion() {
+    const { rowSize, columnSize } = this.puzzle.size;
+    const marginData = copyMarginData(this.marginData);
+    this.axisIterator(
+      marginData.rows,
+      (rowRequirement: number[], rowIndex: number) => {
+        if (this.isRowComplete(rowIndex)) {
+          return;
+        }
+        const minimumTotal = this.getRequirementTotal(rowRequirement, true);
+        if (minimumTotal === rowSize || minimumTotal === 0) {
+          this.fillRow(rowRequirement, rowIndex);
+          this.marginData.rows[rowIndex] = [];
+        }
+      }
+    );
+    this.axisIterator(marginData.columns, (columnRequirement, columnIndex) => {
+      if (this.isColComplete(columnIndex)) {
+        return;
+      }
+      const minimumTotal = this.getRequirementTotal(columnRequirement, true);
+      if (minimumTotal === columnSize || minimumTotal === 0) {
+        this.fillColumn(columnRequirement, columnIndex);
+      }
+    });
   }
 
   isRowComplete(rowIndex: number) {
@@ -132,8 +144,7 @@ export class Solver {
     const isComplete =
       this.getRowSum(rowIndex) === this.rowTotalRequired[rowIndex];
     if (isComplete) {
-      this.completedRows.push(rowIndex);
-      this.excludeRemainingRow(rowIndex);
+      this.setRowComplete(rowIndex);
     }
     return isComplete;
   }
@@ -145,8 +156,7 @@ export class Solver {
     const isComplete =
       this.getColSum(colIndex) === this.colTotalRequired[colIndex];
     if (isComplete) {
-      this.completedCols.push(colIndex);
-      this.excludeRemainingColumn(colIndex);
+      this.setColComplete(colIndex);
     }
     return isComplete;
   }
