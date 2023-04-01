@@ -24,6 +24,8 @@ export class Solver {
   completedCols: number[] = [];
   rowSize: number;
   colSize: number;
+  currentRun: number = 0;
+  numRecursions: number = 0;
 
   constructor(marginData: MarginData, puzzle: Puzzle) {
     this.marginData = copyMarginData(marginData);
@@ -82,6 +84,7 @@ export class Solver {
   }
 
   setCell(rowIndex, columnIndex, cellValue) {
+    const cell = this.solution[rowIndex][columnIndex];
     this.solution[rowIndex][columnIndex] = cellValue;
   }
 
@@ -102,7 +105,10 @@ export class Solver {
   public solve() {
     console.log(this.puzzle);
     this.solveRecursion();
-    console.log("Margin Data: ", this.marginData);
+    this.solveRecursion();
+    this.solveRecursion();
+    this.solveRecursion();
+    this.solveRecursion();
     this.solveRecursion();
     console.log("Solution: ", this.solution);
     console.log("Completed: ", this.completedRows, this.completedCols);
@@ -110,7 +116,98 @@ export class Solver {
     return this.solution;
   }
 
+  trySolveRow(rowIndex, row, rowRequirement) {
+    var localRequirement = [...rowRequirement];
+    var localRow = [...row];
+    for (let colIndex = 0; colIndex < this.colSize; colIndex++) {
+      const cell = localRow[colIndex];
+      let requirement = localRequirement[0];
+      if (requirement === 0) {
+        localRow[colIndex] = 0;
+        localRequirement.shift();
+      } else if (cell != 0) {
+        localRow[colIndex] = 1;
+        localRequirement[0] -= 1;
+      }
+    }
+    if (localRequirement.length === 0) {
+      this.applyRow(rowIndex, localRow);
+    }
+    return localRequirement.length === 0;
+  }
+  applyRow(rowIndex, rowData) {
+    rowData.forEach((cellValue, colIndex) => {
+      this.setCell(rowIndex, colIndex, cellValue);
+    });
+  }
+  applyCol(colIndex, rowData) {
+    rowData.forEach((cellValue, rowIndex) => {
+      this.setCell(rowIndex, colIndex, cellValue);
+    });
+  }
+  solveRow(rowRequirement: number[], rowIndex) {
+    var localRow = this.solution[rowIndex];
+    var localRequirement = [...rowRequirement];
+    if (this.trySolveRow(rowIndex, localRow, localRequirement)) {
+      return;
+    }
+    this.currentRun = 0;
+    for (let colIndex = 0; colIndex < this.colSize; colIndex++) {
+      this.iterateAxis(rowIndex, colIndex, localRequirement);
+    }
+  }
+  getColumn(colIndex: number) {
+    const column = [];
+    for (let rowIndex = 0; rowIndex < this.rowSize; rowIndex++) {
+      column.push(this.solution[rowIndex][colIndex]);
+    }
+    return column;
+  }
+  trySolveColumn(colIndex, colData, colRequirement) {
+    var localRequirement = [...colRequirement];
+    var localRow = [...colData];
+    for (let rowIndex = 0; rowIndex < this.rowSize; rowIndex++) {
+      const cell = localRow[colIndex];
+      let requirement = localRequirement[0];
+      if (requirement === 0) {
+        localRow[colIndex] = 0;
+        localRequirement.shift();
+      } else if (cell != 0) {
+        localRow[colIndex] = 1;
+        localRequirement[0] -= 1;
+      }
+    }
+    if (localRequirement.length === 0) {
+      this.applyCol(colIndex, localRow);
+    }
+    return localRequirement.length === 0;
+  }
+  solveColumn(colRequirement: number[], colIndex: number) {
+    var localRequirement = [...colRequirement];
+    const localCol = this.getColumn(colIndex);
+    if (this.trySolveColumn(colIndex, localCol, colRequirement)) {
+      return;
+    }
+    this.currentRun = 0;
+    for (let rowIndex = 0; rowIndex < this.rowSize; rowIndex++) {
+      this.iterateAxis(rowIndex, colIndex, localRequirement);
+    }
+  }
+  iterateAxis(rowIndex, colIndex, localRequirement) {
+    const cell = this.solution[rowIndex][colIndex];
+    if (this.currentRun === localRequirement[0]) {
+      localRequirement.shift();
+      this.setCell(rowIndex, colIndex, 0);
+      this.currentRun = 0;
+    } else if (cell === 1) {
+      this.currentRun += 1;
+    } else if (localRequirement[0] > 0 && cell === -1 && this.currentRun > 0) {
+      this.setCell(rowIndex, colIndex, 1);
+      this.currentRun += 1;
+    }
+  }
   solveRecursion() {
+    this.numRecursions += 1;
     const { rowSize, columnSize } = this.puzzle.size;
     const marginData = copyMarginData(this.marginData);
     this.axisIterator(
@@ -123,6 +220,8 @@ export class Solver {
         if (minimumTotal === rowSize || minimumTotal === 0) {
           this.fillRow(rowRequirement, rowIndex);
           this.marginData.rows[rowIndex] = [];
+        } else {
+          this.solveRow(rowRequirement, rowIndex);
         }
       }
     );
@@ -133,6 +232,8 @@ export class Solver {
       const minimumTotal = this.getRequirementTotal(columnRequirement, true);
       if (minimumTotal === columnSize || minimumTotal === 0) {
         this.fillColumn(columnRequirement, columnIndex);
+      } else {
+        this.solveColumn(columnRequirement, columnIndex);
       }
     });
   }
