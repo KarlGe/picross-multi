@@ -84,7 +84,6 @@ export class Solver {
   }
 
   setCell(rowIndex, columnIndex, cellValue) {
-    const cell = this.solution[rowIndex][columnIndex];
     this.solution[rowIndex][columnIndex] = cellValue;
   }
 
@@ -102,44 +101,71 @@ export class Solver {
     return this.solution;
   }
 
-  tryRowComplete(rowIndex, rowRequirement) {
-    var localRequirement = [...rowRequirement];
-    var localRow = [...this.solution[rowIndex]];
-    for (let colIndex = 0; colIndex < this.colSize; colIndex++) {
-      const cell = localRow[colIndex];
+  tryAxisComplete(
+    axisIndex,
+    axisData,
+    requirement,
+    size: number,
+    onRowComplete
+  ) {
+    var localRequirement = [...requirement];
+    var localAxis = [...axisData];
+
+    for (let colIndex = 0; colIndex < size; colIndex++) {
+      const cell = localAxis[colIndex];
       let requirement = localRequirement[0];
       if (requirement === 0) {
-        localRow[colIndex] = 0;
+        localAxis[colIndex] = 0;
         localRequirement.shift();
       } else if (cell != 0) {
-        localRow[colIndex] = 1;
+        localAxis[colIndex] = 1;
         localRequirement[0] -= 1;
       }
     }
-    if (localRequirement.length === 0) {
-      this.applyRow(rowIndex, localRow);
+    if (localRequirement.length === 1 && localRequirement[0] === 0) {
+      onRowComplete(axisIndex, localAxis);
     }
     return localRequirement.length === 0;
   }
-  applyRow(rowIndex, rowData) {
+
+  tryRowComplete(rowIndex, rowRequirement) {
+    return this.tryAxisComplete(
+      rowIndex,
+      this.solution[rowIndex],
+      rowRequirement,
+      this.rowSize,
+      this.applyRow
+    );
+  }
+  tryColumnComplete(colIndex, colData, colRequirement) {
+    return this.tryAxisComplete(
+      colIndex,
+      colData,
+      colRequirement,
+      this.colSize,
+      this.applyCol
+    );
+  }
+  applyRow = (rowIndex, rowData) => {
     rowData.forEach((cellValue, colIndex) => {
       this.setCell(rowIndex, colIndex, cellValue);
     });
-  }
-  applyCol(colIndex, rowData) {
+  };
+  applyCol = (colIndex, rowData) => {
     rowData.forEach((cellValue, rowIndex) => {
       this.setCell(rowIndex, colIndex, cellValue);
     });
-  }
+  };
   solveRow(rowRequirement: number[], rowIndex) {
-    var localRow = this.solution[rowIndex];
     var localRequirement = [...rowRequirement];
     if (this.tryRowComplete(rowIndex, localRequirement)) {
       return;
     }
     this.currentRun = 0;
     for (let colIndex = 0; colIndex < this.colSize; colIndex++) {
-      this.iterateAxis(rowIndex, colIndex, localRequirement);
+      const cell = this.solution[rowIndex][colIndex];
+      const prevCell = colIndex > 0 ? this.solution[rowIndex][colIndex - 1] : 0;
+      this.iterateAxis(cell, prevCell, rowIndex, colIndex, localRequirement);
     }
   }
   getColumn(colIndex: number) {
@@ -149,25 +175,6 @@ export class Solver {
     }
     return column;
   }
-  tryColumnComplete(colIndex, colData, colRequirement) {
-    var localRequirement = [...colRequirement];
-    var localRow = [...colData];
-    for (let rowIndex = 0; rowIndex < this.rowSize; rowIndex++) {
-      const cell = localRow[colIndex];
-      let requirement = localRequirement[0];
-      if (requirement === 0) {
-        localRow[colIndex] = 0;
-        localRequirement.shift();
-      } else if (cell != 0) {
-        localRow[colIndex] = 1;
-        localRequirement[0] -= 1;
-      }
-    }
-    if (localRequirement.length === 0) {
-      this.applyCol(colIndex, localRow);
-    }
-    return localRequirement.length === 0;
-  }
   solveColumn(colRequirement: number[], colIndex: number) {
     var localRequirement = [...colRequirement];
     const localCol = this.getColumn(colIndex);
@@ -176,16 +183,17 @@ export class Solver {
     }
     this.currentRun = 0;
     for (let rowIndex = 0; rowIndex < this.rowSize; rowIndex++) {
-      this.iterateAxis(rowIndex, colIndex, localRequirement);
+      const cell = this.solution[rowIndex][colIndex];
+      const prevCell = rowIndex > 0 ? this.solution[rowIndex - 1][colIndex] : 0;
+      this.iterateAxis(cell, prevCell, rowIndex, colIndex, localRequirement);
     }
   }
-  iterateAxis(rowIndex, colIndex, localRequirement) {
-    const cell = this.solution[rowIndex][colIndex];
+  iterateAxis(cell, prevCell, rowIndex, colIndex, localRequirement) {
     if (this.currentRun === localRequirement[0]) {
       localRequirement.shift();
       this.setCell(rowIndex, colIndex, 0);
       this.currentRun = 0;
-    } else if (cell === 1) {
+    } else if (cell === 1 && prevCell === 0) {
       this.currentRun += 1;
     } else if (localRequirement[0] > 0 && cell === -1 && this.currentRun > 0) {
       this.setCell(rowIndex, colIndex, 1);
