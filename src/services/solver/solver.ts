@@ -9,6 +9,7 @@ import type {
 import type MarginNumber from "@components/Margins/MarginNumber.svelte";
 
 type AxisTotal = { [n: number]: number };
+type SolutionData = { rowIndex: number; colIndex: number; value: number };
 
 const copyMarginData = (data: MarginData) => {
   return JSON.parse(JSON.stringify(data)) as MarginData;
@@ -27,6 +28,9 @@ export class Solver {
   currentRun: number = 0;
   numRecursions: number = 0;
 
+  rows: SolutionData[][] = [];
+  cols: SolutionData[][] = [];
+
   constructor(marginData: MarginData, puzzle: Puzzle) {
     this.marginData = copyMarginData(marginData);
     this.puzzle = puzzle;
@@ -37,37 +41,72 @@ export class Solver {
     console.log("rowTotals: ", this.rowTotalRequired);
     console.log("colTotals: ", this.colTotalRequired);
 
-    boardIterator(
-      puzzle.size.rowSize,
-      puzzle.size.columnSize,
-      (rowIndex) => {
-        this.solution.push([]);
-      },
-      (rowIndex, colIndex) => {
+    for (let rowIndex = 0; rowIndex < puzzle.size.rowSize; rowIndex++) {
+      const row = [];
+      this.solution.push([]);
+      for (let colIndex = 0; colIndex < puzzle.size.columnSize; colIndex++) {
+        if (rowIndex === 0) {
+          this.cols.push([]);
+        }
         this.solution[rowIndex].push(-1);
+        row.push({ rowIndex, colIndex, value: -1 });
+        this.cols[colIndex].push({ rowIndex, colIndex, value: -1 });
       }
-    );
+      this.rows.push(row);
+    }
   }
 
-  setRowComplete(rowIndex: number) {
-    const row = this.solution[rowIndex];
-    row.forEach((cell, index) => {
-      this.setCell(rowIndex, index, cell === -1 ? 0 : cell);
-    });
+  public solve() {
+    console.log(this.puzzle);
+    for (let iterationIndex = 0; iterationIndex < 10; iterationIndex++) {
+      this.solveRecursion();
+    }
+    console.log("Solution: ", this.solution);
+    console.log("Completed: ", this.completedRows, this.completedCols);
+    console.log("FinalRows: ", this.rows);
+    console.log("FinalCols: ", this.cols);
+    return this.solution;
+  }
+
+  setRowComplete(
+    rowIndex: number,
+    filledRow: number[] = undefined,
+    fillStartIndex = 0
+  ) {
+    if (filledRow) {
+      filledRow.forEach((cellValue, cellIndex) => {
+        this.setCell(rowIndex, fillStartIndex + cellIndex, cellValue);
+      });
+    } else {
+      const row = this.solution[rowIndex];
+      row.forEach((cell, index) => {
+        this.setCell(rowIndex, index, cell === -1 ? 0 : cell);
+      });
+    }
     this.marginData.rows[rowIndex] = [];
     this.completedRows.push(rowIndex);
   }
 
-  setColComplete(colIndex: number) {
-    this.solution.forEach((row, rowIndex) => {
-      const cell = row[colIndex];
-      this.setCell(rowIndex, colIndex, cell === -1 ? 0 : cell);
-    });
+  setColComplete(
+    colIndex: number,
+    filledCol: number[] = undefined,
+    fillStartIndex = 0
+  ) {
+    if (filledCol) {
+      filledCol.forEach((cellValue, cellIndex) => {
+        this.setCell(cellIndex, fillStartIndex + colIndex, cellValue);
+      });
+    } else {
+      this.solution.forEach((row, rowIndex) => {
+        const cell = row[colIndex];
+        this.setCell(rowIndex, colIndex, cell === -1 ? 0 : cell);
+      });
+    }
     this.marginData.columns[colIndex] = [];
     this.completedCols.push(colIndex);
   }
 
-  generateFilled(requirement, maxLength) {
+  generateFilled(requirement, maxLength): number[] {
     if (requirement.length === 0) {
       return new Array(maxLength).fill(0);
     }
@@ -83,126 +122,107 @@ export class Solver {
     return filledAxis;
   }
 
-  setCell(rowIndex, columnIndex, cellValue) {
-    this.solution[rowIndex][columnIndex] = cellValue;
-  }
-
-  public solve() {
-    console.log(this.puzzle);
-    this.solveRecursion();
-    this.solveRecursion();
-    this.solveRecursion();
-    this.solveRecursion();
-    this.solveRecursion();
-    this.solveRecursion();
-    console.log("Solution: ", this.solution);
-    console.log("Completed: ", this.completedRows, this.completedCols);
-
-    return this.solution;
-  }
-
-  tryAxisComplete(
-    axisIndex,
-    axisData,
-    requirement,
-    size: number,
-    onRowComplete
-  ) {
-    var localRequirement = [...requirement];
-    var localAxis = [...axisData];
-
-    for (let colIndex = 0; colIndex < size; colIndex++) {
-      const cell = localAxis[colIndex];
-      let requirement = localRequirement[0];
-      if (requirement === 0) {
-        localAxis[colIndex] = 0;
-        localRequirement.shift();
-      } else if (cell != 0) {
-        localAxis[colIndex] = 1;
-        localRequirement[0] -= 1;
-      }
+  /**
+   * Recursively removes the first and last element of a row/column if it's a 0/X
+   * Makes it easier to compare size of axis to requirements
+   */
+  cleanRows = (rowIndex: number) => {
+    const row = this.rows[rowIndex];
+    if (row[0]?.value === 0) {
+      row.shift();
+      this.rows[rowIndex] = row;
+      this.cleanRows(rowIndex);
     }
-    if (localRequirement.length === 1 && localRequirement[0] === 0) {
-      onRowComplete(axisIndex, localAxis);
+    if (row[row.length - 1]?.value === 0) {
+      row.pop();
+      this.rows[rowIndex] = row;
+      this.cleanRows(rowIndex);
     }
-    return localRequirement.length === 0;
-  }
-
-  tryRowComplete(rowIndex, rowRequirement) {
-    return this.tryAxisComplete(
-      rowIndex,
-      this.solution[rowIndex],
-      rowRequirement,
-      this.rowSize,
-      this.applyRow
-    );
-  }
-  tryColumnComplete(colIndex, colData, colRequirement) {
-    return this.tryAxisComplete(
-      colIndex,
-      colData,
-      colRequirement,
-      this.colSize,
-      this.applyCol
-    );
-  }
-  applyRow = (rowIndex, rowData) => {
-    rowData.forEach((cellValue, colIndex) => {
-      this.setCell(rowIndex, colIndex, cellValue);
-    });
   };
-  applyCol = (colIndex, rowData) => {
-    rowData.forEach((cellValue, rowIndex) => {
-      this.setCell(rowIndex, colIndex, cellValue);
-    });
+  cleanCols = (colIndex: number) => {
+    const col = this.cols[colIndex];
+    if (col[0]?.value === 0) {
+      col.shift();
+      this.cols[colIndex] = col;
+      this.cleanCols(colIndex);
+    }
+    if (col[col.length - 1]?.value === 0) {
+      col.pop();
+      this.cols[colIndex] = col;
+      this.cleanCols(colIndex);
+    }
+  };
+
+  setCell(rowIndex, colIndex, cellValue) {
+    this.solution[rowIndex][colIndex] = cellValue;
+    const rowCell = this.rows[rowIndex][colIndex];
+    if (rowCell) {
+      rowCell.value = cellValue;
+    }
+    const colCell = this.cols[colIndex][rowIndex];
+    if (colCell) {
+      colCell.value = cellValue;
+    }
+    this.cleanCols(colIndex);
+    this.cleanRows(rowIndex);
+  }
+
+  applyRow = (rowIndex, rowData: SolutionData[]) => {
+    const startIndex = rowData[0].colIndex;
+    for (let colIndex = startIndex; colIndex < rowData.length; colIndex++) {
+      this.setCell(rowIndex, colIndex, rowData[colIndex]);
+    }
+  };
+  applyCol = (colIndex, colData: SolutionData[]) => {
+    const startIndex = colData[0].rowIndex;
+    for (let rowIndex = startIndex; rowIndex < colData.length; rowIndex++) {
+      this.setCell(colIndex, rowIndex, colData[colIndex]);
+    }
   };
   solveRow(rowRequirement: number[], rowIndex) {
     var localRequirement = [...rowRequirement];
-    if (this.tryRowComplete(rowIndex, localRequirement)) {
-      return;
+    const newRow = this.solveAxis(this.rows[rowIndex], localRequirement);
+    if (newRow) {
+      this.applyRow(rowIndex, newRow);
     }
-    this.currentRun = 0;
-    for (let colIndex = 0; colIndex < this.colSize; colIndex++) {
-      const cell = this.solution[rowIndex][colIndex];
-      const prevCell = colIndex > 0 ? this.solution[rowIndex][colIndex - 1] : 0;
-      this.iterateAxis(cell, prevCell, rowIndex, colIndex, localRequirement);
-    }
-  }
-  getColumn(colIndex: number) {
-    const column = [];
-    for (let rowIndex = 0; rowIndex < this.rowSize; rowIndex++) {
-      column.push(this.solution[rowIndex][colIndex]);
-    }
-    return column;
   }
   solveColumn(colRequirement: number[], colIndex: number) {
     var localRequirement = [...colRequirement];
-    const localCol = this.getColumn(colIndex);
-    if (this.tryColumnComplete(colIndex, localCol, colRequirement)) {
-      return;
-    }
     this.currentRun = 0;
-    for (let rowIndex = 0; rowIndex < this.rowSize; rowIndex++) {
-      const cell = this.solution[rowIndex][colIndex];
-      const prevCell = rowIndex > 0 ? this.solution[rowIndex - 1][colIndex] : 0;
-      this.iterateAxis(cell, prevCell, rowIndex, colIndex, localRequirement);
+    const newColumn = this.solveAxis(this.cols[colIndex], localRequirement);
+    if (newColumn) {
+      this.applyCol(colIndex, newColumn);
     }
   }
-  iterateAxis(cell, prevCell, rowIndex, colIndex, localRequirement) {
-    if (this.currentRun === localRequirement[0]) {
-      localRequirement.shift();
-      this.setCell(rowIndex, colIndex, 0);
-      this.currentRun = 0;
-    } else if (cell === 1 && prevCell === 0) {
-      this.currentRun += 1;
-    } else if (localRequirement[0] > 0 && cell === -1 && this.currentRun > 0) {
-      this.setCell(rowIndex, colIndex, 1);
-      this.currentRun += 1;
+  solveAxis(axis: SolutionData[], requirementArray) {
+    const localAxis = [...axis];
+    const localRequirement = [...requirementArray];
+    const length = localAxis.length;
+    let currentRun = 0;
+    for (let axisIndex = 0; axisIndex < length; axisIndex++) {
+      const cell = localAxis[axisIndex];
+      const prevCell = axisIndex > 0 ? localAxis[axisIndex - 1] : 0;
+      if (localRequirement.length === 0 && cell.value === -1) {
+        localAxis[axisIndex].value = 0;
+      } else if (currentRun === localRequirement[0]) {
+        localRequirement.shift();
+        localAxis[axisIndex].value = 0;
+        currentRun = 0;
+      } else if (cell.value === 1 && prevCell === 0) {
+        currentRun += 1;
+      } else if (
+        localRequirement[0] > 0 &&
+        cell.value !== 0 &&
+        currentRun > 0
+      ) {
+        localAxis[axisIndex].value = 1;
+        currentRun += 1;
+      }
     }
+    return localRequirement.length === 0 ? localAxis : undefined;
   }
   solveRecursion() {
     this.numRecursions += 1;
-    const { rowSize, columnSize } = this.puzzle.size;
     const marginData = copyMarginData(this.marginData);
     this.axisIterator(
       marginData.rows,
@@ -225,6 +245,16 @@ export class Solver {
     if (this.completedRows.includes(rowIndex)) {
       return true;
     }
+    const row = this.rows[rowIndex];
+    const requirement = this.marginData.rows[rowIndex];
+    if (this.getRequirementTotal(requirement, true) === row.length) {
+      this.setRowComplete(
+        rowIndex,
+        this.generateFilled(requirement, row.length),
+        row[0].colIndex
+      );
+      return true;
+    }
     const isComplete =
       this.getRowSum(rowIndex) === this.rowTotalRequired[rowIndex];
     if (isComplete) {
@@ -235,6 +265,16 @@ export class Solver {
 
   isColComplete(colIndex: number) {
     if (this.completedCols.includes(colIndex)) {
+      return true;
+    }
+    const col = this.cols[colIndex];
+    const requirement = this.marginData.columns[colIndex];
+    if (this.getRequirementTotal(requirement, true) === col.length) {
+      this.setColComplete(
+        colIndex,
+        this.generateFilled(requirement, col.length),
+        col[0].rowIndex
+      );
       return true;
     }
     const isComplete =
@@ -259,18 +299,17 @@ export class Solver {
       );
     }
   }
+  getAxisSum = (solutionAxis: SolutionData[]) => {
+    return solutionAxis.reduce(
+      (sum, cell) => (cell.value === 1 ? sum + 1 : sum),
+      0
+    );
+  };
   getRowSum = (rowIndex) => {
-    return this.solution[rowIndex].reduce((partialSum, a) => {
-      return partialSum + (a === 1 ? 1 : 0);
-    }, 0);
+    return this.getAxisSum(this.rows[rowIndex]);
   };
   getColSum = (colIndex) => {
-    let sum = 0;
-    for (let rowIndex = 0; rowIndex < this.rowSize; rowIndex++) {
-      const cell = this.solution[rowIndex][colIndex];
-      sum += cell === 1 ? 1 : 0;
-    }
-    return sum;
+    return this.getAxisSum(this.cols[colIndex]);
   };
 
   /**
