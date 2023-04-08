@@ -264,7 +264,6 @@ export class Solver {
         cell.value === 1 &&
         (prevCell == null || prevCell.value === 0)
       ) {
-        currentRunStart = axisIndex;
         currentRun += 1;
       } else if (
         localRequirement[0] > 0 &&
@@ -276,8 +275,6 @@ export class Solver {
       } else if (this.isLast(localAxis, axisIndex) && cell.value === 1) {
         const lastRequirement = this.getLast(localRequirement);
         onRunComplete(axisIndex - lastRequirement + 1, lastRequirement);
-      } else if (cell.value === 1) {
-        currentRun += 1;
       } else if (cell.value != 1) {
         currentRun = 0;
       }
