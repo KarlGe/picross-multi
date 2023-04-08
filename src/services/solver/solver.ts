@@ -9,7 +9,11 @@ import type {
 import type MarginNumber from "@components/Margins/MarginNumber.svelte";
 
 type AxisTotal = { [n: number]: number };
-type SolutionData = { rowIndex: number; colIndex: number; value: number };
+type SolutionData = {
+  rowIndex: number;
+  colIndex: number;
+  value: number;
+};
 
 const copyMarginData = (data: MarginData) => {
   return JSON.parse(JSON.stringify(data)) as MarginData;
@@ -49,8 +53,16 @@ export class Solver {
           this.cols.push([]);
         }
         this.solution[rowIndex].push(-1);
-        row.push({ rowIndex, colIndex, value: -1 });
-        this.cols[colIndex].push({ rowIndex, colIndex, value: -1 });
+        row.push({
+          rowIndex,
+          colIndex,
+          value: -1,
+        });
+        this.cols[colIndex].push({
+          rowIndex,
+          colIndex,
+          value: -1,
+        });
       }
       this.rows.push(row);
     }
@@ -58,7 +70,7 @@ export class Solver {
 
   public solve() {
     console.log(this.puzzle);
-    for (let iterationIndex = 0; iterationIndex < 10; iterationIndex++) {
+    for (let iterationIndex = 0; iterationIndex < 5; iterationIndex++) {
       this.solveRecursion();
     }
     console.log("Solution: ", this.solution);
@@ -194,21 +206,26 @@ export class Solver {
       this.applyCol(colIndex, newColumn);
     }
   }
+  copyAxis = (axis: SolutionData[]) =>
+    axis.map((cellValue) => ({ ...cellValue }));
   solveAxis(axis: SolutionData[], requirementArray) {
-    const localAxis = [...axis];
+    const localAxis = this.copyAxis(axis);
     const localRequirement = [...requirementArray];
     const length = localAxis.length;
     let currentRun = 0;
     for (let axisIndex = 0; axisIndex < length; axisIndex++) {
       const cell = localAxis[axisIndex];
-      const prevCell = axisIndex > 0 ? localAxis[axisIndex - 1] : 0;
+      const prevCell = axisIndex > 0 ? localAxis[axisIndex - 1] : null;
       if (localRequirement.length === 0 && cell.value === -1) {
         localAxis[axisIndex].value = 0;
       } else if (currentRun === localRequirement[0]) {
         localRequirement.shift();
         localAxis[axisIndex].value = 0;
         currentRun = 0;
-      } else if (cell.value === 1 && prevCell === 0) {
+      } else if (
+        cell.value === 1 &&
+        (prevCell == null || prevCell.value === 0)
+      ) {
         currentRun += 1;
       } else if (
         localRequirement[0] > 0 &&
@@ -241,6 +258,12 @@ export class Solver {
     });
   }
 
+  axisIterator(array: any[], action: (element: any, index: number) => void) {
+    for (let index = 0; index < array.length; index++) {
+      action(array[index], index);
+    }
+  }
+
   isRowComplete(rowIndex: number) {
     if (this.completedRows.includes(rowIndex)) {
       return true;
@@ -255,8 +278,8 @@ export class Solver {
       );
       return true;
     }
-    const isComplete =
-      this.getRowSum(rowIndex) === this.rowTotalRequired[rowIndex];
+    const rowSum = this.getRowSum(rowIndex);
+    const isComplete = rowSum === this.rowTotalRequired[rowIndex];
     if (isComplete) {
       this.setRowComplete(rowIndex);
     }
@@ -283,12 +306,6 @@ export class Solver {
       this.setColComplete(colIndex);
     }
     return isComplete;
-  }
-
-  axisIterator(array: any[], action: (element: any, index: number) => void) {
-    for (let index = 0; index < array.length; index++) {
-      action(array[index], index);
-    }
   }
 
   setAxisTotals(requirementAxis, length: number, totalsObject: AxisTotal) {
