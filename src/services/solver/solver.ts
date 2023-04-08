@@ -94,7 +94,7 @@ export class Solver {
   ) {
     if (filledCol) {
       filledCol.forEach((cellValue, cellIndex) => {
-        this.setCell(cellIndex, fillStartIndex + colIndex, cellValue);
+        this.setCell(fillStartIndex + cellIndex, colIndex, cellValue);
       });
     } else {
       this.solution.forEach((row, rowIndex) => {
@@ -153,7 +153,7 @@ export class Solver {
     }
   };
 
-  setCell(rowIndex, colIndex, cellValue) {
+  setCell(rowIndex, colIndex, cellValue: number) {
     this.solution[rowIndex][colIndex] = cellValue;
     const rowCell = this.rows[rowIndex][colIndex];
     if (rowCell) {
@@ -170,13 +170,13 @@ export class Solver {
   applyRow = (rowIndex, rowData: SolutionData[]) => {
     const startIndex = rowData[0].colIndex;
     for (let colIndex = startIndex; colIndex < rowData.length; colIndex++) {
-      this.setCell(rowIndex, colIndex, rowData[colIndex]);
+      this.setCell(rowIndex, colIndex, rowData[colIndex].value);
     }
   };
   applyCol = (colIndex, colData: SolutionData[]) => {
     const startIndex = colData[0].rowIndex;
     for (let rowIndex = startIndex; rowIndex < colData.length; rowIndex++) {
-      this.setCell(colIndex, rowIndex, colData[colIndex]);
+      this.setCell(colIndex, rowIndex, colData[colIndex].value);
     }
   };
   solveRow(rowRequirement: number[], rowIndex) {
