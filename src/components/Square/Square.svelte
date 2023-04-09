@@ -1,8 +1,8 @@
 <script lang="ts">
   import Cross from "@components/Icons/Cross.svelte";
-  import { isInLine } from "@utils/boardUtils";
+  import { squareEquals } from "@utils/boardUtils";
   import { eventTypes } from "@utils/events";
-  import { onMount } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import type {
     CellPosition,
     SquareData,
@@ -14,8 +14,14 @@
 
   export let squareData: SquareData;
   export let squaresDragged: SquareData[];
+  let prevState: SquareState = '';
 
-  const setState = (state: SquareState) => {
+  const dispatch = createEventDispatcher();
+
+  const setState = (state: SquareState, setPrevState = true) => {
+    if(setPrevState && state !== squareData.state) {
+      prevState = squareData.state;
+    }
     squareData.state = state;
   };
 
@@ -39,10 +45,7 @@
     squaresDragged = [squareData];
   };
   const onDragEnter = (e) => {
-    if (isInLine(squareData, squaresDragged)) {
-      squaresDragged.push(squareData);
-      squareData.state = squaresDragged[0].state;
-    }
+    dispatch("drag", squareData);
   };
   const onCrossAll = (event: CustomEvent<CellPosition>, inverted = false) => {
     const { col, row } = event.detail;
@@ -56,8 +59,22 @@
       }
     }
   };
+  const onSetSquare = (event: CustomEvent<SquareData>) => {
+    const newSquareData = event.detail;
+    if (squareEquals(squareData, newSquareData)) {
+      setState(newSquareData.state);
+    }
+  };
+  const onRevertSquare = (event: CustomEvent<SquareData>) => {
+    const newSquareData = event.detail;
+    if (squareEquals(squareData, newSquareData)) {
+      setState(prevState);
+    }
+  };
   onMount(() => {
     window.addEventListener(eventTypes.crossall, onCrossAll);
+    window.addEventListener(eventTypes.setSquare, onSetSquare);
+    window.addEventListener(eventTypes.revertSquare, onRevertSquare);
     window.addEventListener(
       eventTypes.crossallinvert,
       (e: CustomEvent<CellPosition>) => onCrossAll(e, true)

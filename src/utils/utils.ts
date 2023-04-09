@@ -1,4 +1,4 @@
-import type { PuzzleSize } from "@customTypes/gameTypes";
+import type { PuzzleSize, SquareData } from "@customTypes/gameTypes";
 import { makeSeed } from "@services/rand";
 
 const queryKeys = {
@@ -50,4 +50,41 @@ export function getQuerySeed() {
     return newSeed;
   }
   return querySeed;
+}
+
+/**
+ * Iterates between two numbers independent of which one is the larger number
+ * @param inputX First number
+ * @param inputY Second number
+ * @param action Action to perform for each iteration
+ */
+export function iterateBetween(
+  inputX: number,
+  inputY: number,
+  action: (actionIndex: number) => void
+) {
+  if (inputX === inputY) {
+    action(inputX);
+  }
+  else if (inputY > inputX) {
+    for (let index = inputX; index <= inputY; index++) {
+      action(index);
+    }
+  }
+  else if (inputX > inputY) {
+    for (let index = inputY; index <= inputX; index++) {
+      action(index);
+    }
+  }
+}
+
+export function isBetween(x: SquareData, y1: SquareData, y2: SquareData) {
+  return (
+    (x.rowNum === y1.rowNum && inRange(x.columnNum, y1.columnNum, y2.columnNum)) ||
+    (x.columnNum === y1.columnNum && inRange(x.rowNum, y1.rowNum, y2.rowNum))
+  );
+}
+
+export function inRange(x: number, y1: number, y2: number) {
+  return (x - y1) * (x - y2) <= 0;
 }

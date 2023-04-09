@@ -8,7 +8,9 @@
     SquareData,
   } from "@customTypes/gameTypes";
   import { createInitialData } from "@services/generator";
+  import { checkIsInLine } from "@utils/boardUtils";
   import { eventTypes } from "@utils/events";
+  import { isBetween, iterateBetween } from "@utils/utils";
   import { onMount } from "svelte";
   import BoardFooter from "./BoardFooter/BoardFooter.svelte";
   export let marginRowWidth: number;
@@ -36,8 +38,10 @@
   $: gameWidth = screenWidth - marginRowWidth;
 
   const getSquareSize = (totalWidth: number, numberOfSquares: number) => {
-    const squareSize = Math.floor(Math.min((totalWidth - 50) / numberOfSquares, 50)); 
-    return squareSize - squareSize % 2;
+    const squareSize = Math.floor(
+      Math.min((totalWidth - 50) / numberOfSquares, 50)
+    );
+    return squareSize - (squareSize % 2);
   };
 
   $: styleVars = `
@@ -47,6 +51,58 @@
 
   let squaresDragged: SquareData[] = [];
 
+  const onDrag = (e: CustomEvent<SquareData>) => {
+    const { detail: squareData } = e;
+    const { inLine, sameCol, sameRow } = checkIsInLine(
+      squareData,
+      squaresDragged
+    );
+    const firstSquare = squaresDragged[0];
+    if (inLine) {
+      const newList = [squaresDragged[0]];
+      const dispatchNewSquare = (newSquare: SquareData) => {
+        window.dispatchEvent(
+          new CustomEvent<SquareData>(eventTypes.setSquare, {
+            detail: newSquare,
+          })
+        );
+        newList.push(newSquare);
+      };
+      if (sameCol) {
+        iterateBetween(squaresDragged[0].rowNum, squareData.rowNum, (i) => {
+          const newSquare = {
+            columnNum: firstSquare.columnNum,
+            rowNum: i,
+            state: firstSquare.state,
+          } as SquareData;
+          dispatchNewSquare(newSquare);
+        });
+      } else if (sameRow) {
+        iterateBetween(
+          squaresDragged[0].columnNum,
+          squareData.columnNum,
+          (i) => {
+            const newSquare = {
+              columnNum: i,
+              rowNum: firstSquare.rowNum,
+              state: firstSquare.state,
+            } as SquareData;
+            dispatchNewSquare(newSquare);
+          }
+        );
+      }
+      squaresDragged.forEach((existingSquare) => {
+        if (!isBetween(existingSquare, squaresDragged[0], squareData)) {
+          window.dispatchEvent(
+            new CustomEvent<SquareData>(eventTypes.revertSquare, {
+              detail: existingSquare,
+            })
+          );
+        }
+      });
+      squaresDragged = newList;
+    }
+  };
   const endDrag = () => {
     squaresDragged = [];
   };
@@ -61,7 +117,11 @@
       {#each boardData as squareRow}
         <div class="row">
           {#each squareRow as square}
-            <Square bind:squareData={square} bind:squaresDragged />
+            <Square
+              bind:squareData={square}
+              bind:squaresDragged
+              on:drag={onDrag}
+            />
           {/each}
         </div>
       {/each}

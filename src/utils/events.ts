@@ -3,4 +3,6 @@ export const eventTypes = {
   clear: "clear",
   crossall: "cross-all",
   crossallinvert: "cross-all-invert",
+  revertSquare: "revert-square",
+  setSquare: "set-square",
 };
