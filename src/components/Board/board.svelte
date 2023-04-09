@@ -1,5 +1,6 @@
 <script lang="ts">
-  import Margins from "@components/Margins/Margins.svelte";
+  import CursorTooltip from "@components/CursorTooltip/cursorTooltip.svelte";
+import Margins from "@components/Margins/Margins.svelte";
   import PostMargins from "@components/PostMargins/PostMargins.svelte";
   import Square from "@components/Square/Square.svelte";
   import type {
@@ -114,7 +115,7 @@
 <svelte:body on:pointerup={endDrag} />
 
 <div id="board-wrapper" style={styleVars}>
-  {squaresDragged.length}
+  <CursorTooltip bind:squaresDragged />
   {#if margins.rows && margins.columns && boardData}
     <Margins bind:marginData={margins} bind:rowWidth={marginRowWidth} />
     <div id="board">
