@@ -4,8 +4,8 @@
   let pos = [0, 0];
 
   $: styleVars = `
-  left: ${pos[0] - 30}px; 
-  top: ${pos[1] - 10}px;`;
+  left: ${pos[0] - 50}px; 
+  top: ${pos[1] - 20}px;`;
   const handlePosition = (e) => {
     if (e.touches || e.changedTouches) {
       const { clientX, clientY } = (e.touches || e.changedTouches)[0];
