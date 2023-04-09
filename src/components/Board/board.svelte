@@ -8,7 +8,7 @@
     SquareData,
   } from "@customTypes/gameTypes";
   import { createInitialData } from "@services/generator";
-  import { checkIsInLine } from "@utils/boardUtils";
+  import { checkIsInLine, squareEquals } from "@utils/boardUtils";
   import { eventTypes } from "@utils/events";
   import { isBetween, iterateBetween } from "@utils/utils";
   import { onMount } from "svelte";
@@ -59,8 +59,11 @@
     );
     const firstSquare = squaresDragged[0];
     if (inLine) {
-      const newList = [squaresDragged[0]];
+      const newList = [firstSquare];
       const dispatchNewSquare = (newSquare: SquareData) => {
+        if(squareEquals(newSquare, firstSquare)) {
+          return;
+        }
         window.dispatchEvent(
           new CustomEvent<SquareData>(eventTypes.setSquare, {
             detail: newSquare,
@@ -111,6 +114,7 @@
 <svelte:body on:pointerup={endDrag} />
 
 <div id="board-wrapper" style={styleVars}>
+  {squaresDragged.length}
   {#if margins.rows && margins.columns && boardData}
     <Margins bind:marginData={margins} bind:rowWidth={marginRowWidth} />
     <div id="board">
