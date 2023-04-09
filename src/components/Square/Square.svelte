@@ -27,6 +27,7 @@
 
   const onClick = (type: ClickType) => {
     if (type == "right") {
+      squaresDragged = [squareData];
       if (squareData.state == "excluded") {
         setState("");
       } else {
