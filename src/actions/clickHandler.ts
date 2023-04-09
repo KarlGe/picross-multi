@@ -1,9 +1,22 @@
 const doubleClickTime = 300;
 
+const isRightClick = (e) => {
+  return (e.which && e.which === 3) || (e.button && e.button === 2);
+};
+
 export function clickHandler(node: HTMLElement) {
   let lastClickedTime: Date;
 
+  const handleRightClick = (e: MouseEvent) => {
+    e.preventDefault();
+    node.dispatchEvent(new CustomEvent("rightclick"));
+  };
+
   const handleClick = (e) => {
+    if (isRightClick(e)) {
+      handleRightClick(e);
+      return;
+    }
     const clickedTime = new Date();
     const clickDiff = lastClickedTime
       ? clickedTime.getTime() - lastClickedTime.getTime()
@@ -17,22 +30,21 @@ export function clickHandler(node: HTMLElement) {
     node.dispatchEvent(new CustomEvent("leftclick"));
   };
 
-  const handleRightClick = (e: MouseEvent) => {
-    e.preventDefault();
-    node.dispatchEvent(new CustomEvent("rightclick"));
-  };
-
   const onPointCapture = (e) => {
     e.currentTarget.releasePointerCapture(e.pointerId);
   };
 
+  const handleContextMenu = (e) => {
+    e.preventDefault();
+  };
+
   node.addEventListener("pointerdown", handleClick);
-  node.addEventListener("contextmenu", handleRightClick);
+  node.addEventListener("contextmenu", handleContextMenu);
   node.addEventListener("gotpointercapture", onPointCapture);
   return {
     destroy() {
       node.removeEventListener("pointerdown", handleClick);
-      node.removeEventListener("contextmenu", handleRightClick);
+      node.removeEventListener("contextmenu", handleContextMenu);
       node.removeEventListener("gotpointercapture", onPointCapture);
     },
   };

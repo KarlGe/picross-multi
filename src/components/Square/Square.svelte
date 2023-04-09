@@ -14,20 +14,26 @@
 
   export let squareData: SquareData;
   export let squaresDragged: SquareData[];
-  let prevState: SquareState = '';
+  let prevState: SquareState = "";
 
   const dispatch = createEventDispatcher();
 
   const setState = (state: SquareState, setPrevState = true) => {
-    if(setPrevState && state !== squareData.state) {
+    if (setPrevState && state !== squareData.state) {
       prevState = squareData.state;
     }
     squareData.state = state;
   };
 
-  const onClick = (type: ClickType) => {
-    if (type == "right") {
+  const setInitialSquaresDragged = () => {
+    if (squaresDragged.length === 0) {
       squaresDragged = [squareData];
+    }
+  };
+
+  const onClick = (type: ClickType) => {
+    setInitialSquaresDragged();
+    if (type == "right") {
       if (squareData.state == "excluded") {
         setState("");
       } else {
@@ -43,7 +49,6 @@
   };
   const onDragStart = () => {
     onClick("left");
-    squaresDragged = [squareData];
   };
   const onDragEnter = (e) => {
     dispatch("drag", squareData);
