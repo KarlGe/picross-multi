@@ -2,15 +2,18 @@
   export let squaresDragged;
 
   let pos = [0, 0];
+  let isTouch = false;
 
   $: styleVars = `
-  left: ${pos[0] - 50}px; 
-  top: ${pos[1] - 20}px;`;
+  left: ${pos[0] - (isTouch ? 100 : 30)}px; 
+  top: ${pos[1] - (isTouch ? 50 : 20)}px;`;
   const handlePosition = (e) => {
     if (e.touches || e.changedTouches) {
+      isTouch = true;
       const { clientX, clientY } = (e.touches || e.changedTouches)[0];
       pos = [clientX, clientY];
     } else {
+        isTouch = false;
       pos = [e.clientX, e.clientY];
     }
   };
