@@ -7,9 +7,6 @@
   left: ${pos[0] - 30}px; 
   top: ${pos[1] - 10}px;`;
   const handlePosition = (e) => {
-    if (e.touches) {
-      console.log(e.touches[0]);
-    }
     if (e.touches || e.changedTouches) {
       const { clientX, clientY } = (e.touches || e.changedTouches)[0];
       pos = [clientX, clientY];
